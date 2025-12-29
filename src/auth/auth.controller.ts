@@ -11,3 +11,4 @@ export class AuthController {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
 }
+// curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"

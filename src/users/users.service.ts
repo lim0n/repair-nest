@@ -14,6 +14,7 @@ export class UsersService {
       email: '',
       username: 'john',
       password: 'changeme',
+      user_role: 'viewer'
     },
     {
       id: 2,
@@ -21,6 +22,7 @@ export class UsersService {
       email: '',
       username: 'maria',
       password: 'guess',
+      user_role: 'viewer'
     },
   ];
 
@@ -29,14 +31,9 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
 
-  async findOne(id: number): Promise<User | undefined> {
-    return this.users.find(user => user.id === id);
-  }
-
   async findUser(username: string): Promise<User | undefined> {
     return this.users.find(user => user.username === username);
   }
-  
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const user = this.usersRepository.create(createUserDto);
@@ -47,24 +44,23 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  // async findOne(id: number): Promise<User> {
-  //   const user = await this.usersRepository.findOneBy({ id });
-  //   if (!user) {
-  //     throw new NotFoundException(`User with ID ${id} not found`);
-  //   }
-  //   return user;
-  // }
-
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User | undefined> {
-    await this.usersRepository.update(id, updateUserDto);
-    return this.findOne(id);
+  async findOne(username: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ username });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${username} not found`);
+    }
+    return user;
   }
 
-  async remove(id: number): Promise<void> {
-    const result = await this.usersRepository.delete(id);
+  async update(username: string, updateUserDto: UpdateUserDto): Promise<User | undefined> {
+    await this.usersRepository.update(username, updateUserDto);
+    return this.findOne(username);
+  }
+
+  async remove(username: string): Promise<void> {
+    const result = await this.usersRepository.delete({ username });
     if (result.affected === 0) {
-      throw new NotFoundException(`User with ID ${id} not found`);
+      throw new NotFoundException(`User with ID ${username} not found`);
     }
   }
-
 }

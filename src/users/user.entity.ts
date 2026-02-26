@@ -1,22 +1,71 @@
-import { Entity, PrimaryGeneratedColumn, Column } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn } from 'typeorm';
 
 @Entity('users')
 export class User {
   @PrimaryGeneratedColumn()
-  id: number;
+  id?: number;
 
-  @Column({ length: 100 })
-  name: string;
+  @Column({
+    nullable: true,
+    type: 'varchar',
+    unique: true,
+    length: 30
+  })
+  username?: string;
 
-  @Column({ unique: true })
-  email: string;
+  @Column({
+    nullable: true,
+    type: 'varchar',
+    length: 90
+   })
+  password?: string;
 
-  @Column({ unique: true })
-  username: string;
+  @Column({
+    nullable: true,
+    type: 'varchar',
+    unique: true,
+    length: 50
+  })
+  email?: string;
 
-  @Column()
-  password: string;
+  @Column({ 
+    nullable: true,
+    type: 'varchar',
+    length: 90
+  })
+  name?: string;
 
-  @Column()
-  user_role: 'admin' | 'manager' | 'editor' | 'viewer' = 'viewer';
+  @Column({
+    nullable: true,
+    type: 'varchar',
+    unique: true,
+    length: 20
+  })
+  phone?: string;
+
+  @Column({
+    nullable: true,
+    default: 'viewer'
+  })
+  user_role?: 'admin' | 'manager' | 'editor' | 'viewer';
+
+  @Column({
+    nullable: true,
+    type: 'timestamptz'
+  })
+  created_at: Date;
+
+  @Column({ 
+    nullable: true,
+    type: 'timestamptz'
+  })
+  updated_at: Date;
+
+  @Column({ 
+    nullable: true,
+    type: 'timestamptz'
+  })
+  @DeleteDateColumn()
+  deleted_at: Date;
+
 }

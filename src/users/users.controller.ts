@@ -9,7 +9,11 @@ export class UsersController {
 
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
-    return this.usersService.create(createUserDto);
+    console.warn('FIRE create, createUserDto = ', createUserDto);
+    const x = this.usersService.create(createUserDto);
+    console.warn('created', x);
+    return x;
+    // return this.usersService.create(createUserDto);
   }
 
   @Get()
@@ -18,27 +22,33 @@ export class UsersController {
     return this.usersService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') username: string) {
-    return this.usersService.findOne(username);
+  @Get(':username')
+  findByName(@Param('username') username: string) {
+    return this.usersService.findUserByName(username);
+  }
+
+  @Get('id/:id')
+  findById(@Param('id') id: number) {
+    return this.usersService.findOne(id);
   }
 
   /** Моковский метод */
-  @Get(':id')
-  findUser(@Param('id') username: string) {
-    return this.usersService.findUser(username);
-  }
+  // @Get(':id')
+  // findUser(@Param('id') username: string) {
+  //   return this.usersService.findUser(username);
+  // }
 
   @Put(':id')
   update(
-    @Param('id') username: string,
+    @Param('id') id: string,
     @Body() updateUserDto: UpdateUserDto,
   ) {
-    return this.usersService.update(username, updateUserDto);
+    console.warn('FIRE update, updateUserDto = ', updateUserDto);
+    return this.usersService.update(Number(id), updateUserDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') username: string) {
-    return this.usersService.remove(username);
+  remove(@Param('id') id: string) {
+    return this.usersService.remove(id);
   }
 }

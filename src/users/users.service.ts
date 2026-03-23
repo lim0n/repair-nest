@@ -82,7 +82,25 @@ export class UsersService {
     console.warn('FIRE findUserByName, username = ', username);
     const user = await this.usersRepository.findOneBy({ username });
     if (!user) {
-      throw new NotFoundException(`User with ID ${username} not found`);
+      throw new NotFoundException(`User with username ${username} not found`);
+    }
+    return user;
+  }
+
+  async findUserByEmail(email: string): Promise<User> {
+    console.warn('FIRE findUserByEmail, email = ', email);
+    const user = await this.usersRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException(`User with email ${email} not found`);
+    }
+    return user;
+  }
+
+  async findUserByPhone(phone: string): Promise<User> {
+    console.warn('FIRE findUserByEmail, phone = ', phone);
+    const user = await this.usersRepository.findOneBy({ phone });
+    if (!user) {
+      throw new NotFoundException(`User with phone ${phone} not found`);
     }
     return user;
   }

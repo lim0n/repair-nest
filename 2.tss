@@ -1,0 +1,52 @@
+/*
+Using QueryRunner for Manual Control
+For more complex scenarios or when you need explicit control over each step, you can use the QueryRunner directly: 
+https://github.com/typeorm/typeorm/issues/5857
+*/
+
+import { getConnection } from "typeorm";
+
+async function insertManual() {
+    const connection = getConnection();
+    const queryRunner = connection.createQueryRunner();
+
+    await queryRunner.connect();
+    await queryRunner.startTransaction();
+
+    try {
+        // Manually insert into the first table and get the result (including the generated ID)
+        const profileResult = await queryRunner.manager.insert(Profile, {
+            bio: "Manual bio",
+            picture: "manual.png"
+        });
+
+        const profileId = profileResult.identifiers[0].id;
+
+        // Use the obtained ID to insert into the second table
+        await queryRunner.manager.insert(User, {
+            firstName: "Jane",
+            lastName: "Doe",
+            profileId: profileId // Assuming you have a profileId column/field
+        });
+
+        await queryRunner.commitTransaction();
+
+    } catch (err) {
+        // Rollback the transaction in case of an error
+        await queryRunner.rollbackTransaction();
+        throw err;
+    } finally {
+        // Release the query runner
+        await queryRunner.release();
+    }
+}
+
+/*
+Key Considerations
+Transactions: This is crucial. It guarantees that if one insert fails, the other is also reverted, maintaining database consistency.
+Entity Relations: Define your relationships with decorators (@OneToOne, @ManyToOne, etc.) to let TypeORM manage much of the complexity for you.
+Order of Operations: When tables have foreign key constraints, you must insert the "parent" row (the one being referenced) before the "child" row (the one with the foreign key). TypeORM handles this for you with the entity-based approach. 
+Stack Overflow https://stackoverflow.com/questions/61175401/sql-how-to-insert-data-into-two-tables-at-a-time-when-one-related-to-another-wi#:~:text=As%20type%20table%20is%20the,3%2C9902%2016%2034
+Stack Overflow https://stackoverflow.com/questions/74456635/nestjs-typeorm-run-insert-operation-with-multiple-repositories#:~:text=1%20Answer&text=To%20explain%20it%20essentially%20you,test%20to%20100%25%20verify%20that.
+ +4
+*/

@@ -1,0 +1,46 @@
+/*
+
+In TypeORM, inserting into two related tables is typically handled by defining the relationships in your entities and using a single .save() operation within a database transaction to ensure data integrity. 
+Stack Overflow
+Stack Overflow
+ +1
+Using Transactions and Entity Relations (Recommended)
+This approach is best when the data in the two tables are related (e.g., a User and a UserProfile). TypeORM can automatically manage the foreign key relationships if they are correctly defined in your entities. 
+
+*/
+
+import { getConnection } from "typeorm";
+import { User } from "../entity/User";
+import { Profile } from "../entity/Profile";
+
+async function createUserWithProfile() {
+    // Use a transaction to ensure both inserts succeed or fail together
+    await getConnection().transaction(async entityManager => {
+        
+        // 1. Create the Profile entity first (or the 'master' table)
+        const profile = new Profile();
+        profile.bio = "Software developer";
+        profile.picture = "photo.png";
+        
+        // Save the profile using the transaction's entityManager
+        await entityManager.save(profile);
+        
+        // 2. Create the User entity
+        const user = new User();
+        user.firstName = "John";
+        user.lastName = "Doe";
+        user.profile = profile; // Assign the saved profile entity (which now has an ID)
+        
+        // Save the user using the same entityManager
+        await entityManager.save(user);
+    });
+}
+
+/*
+
+If you define the relationship in your User entity with a @OneToOne or @ManyToOne decorator, TypeORM will handle the insertion order and foreign keys automatically inside the transaction. 
+ https://stackoverflow.com/questions/74456635/nestjs-typeorm-run-insert-operation-with-multiple-repositories#:~:text=1%20Answer&text=To%20explain%20it%20essentially%20you,test%20to%20100%25%20verify%20that.
+ https://medium.com/@alperenergul49/understanding-typeorm-transactions-a-step-by-step-guide-with-nest-js-f682b63b514a#:~:text=Create%20a%20DTO%20(Data%20Transfer,UserDetailEntity%20table%20with%20other%20information.
+ +3
+
+*/

@@ -21,6 +21,18 @@ export class AuthController {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
+  @HttpCode(HttpStatus.OK)
+  @Post('login/by-email')
+  signInByEmail(@Body() signInDto: Record<string, any>) {
+    return this.authService.signInByEmail(signInDto.email, signInDto.password);
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @Post('login/by-phone')
+  signInByPhone(@Body() signInDto: Record<string, any>) {
+    return this.authService.signInByPhone(signInDto.phone, signInDto.password);
+  }
+
   @UseGuards(AuthGuard)
   @Get('profile')
   getProfile(@Request() req) {

@@ -8,30 +8,17 @@ import {
 }
 from 'typeorm';
 
-@Entity('users')
-export class User {
+@Entity('orders')
+export class Order {
   @PrimaryGeneratedColumn()
   id?: number;
 
-  @Column({
-    nullable: true,
-    type: 'varchar',
-    unique: true,
-    length: 30
-  })
-  username?: string;
+  @Column({ nullable: true })
+  user_id: number;
 
   @Column({
     nullable: true,
     type: 'varchar',
-    length: 90
-   })
-  password?: string;
-
-  @Column({
-    nullable: true,
-    type: 'varchar',
-    unique: true,
     length: 50
   })
   email?: string;
@@ -46,29 +33,22 @@ export class User {
   @Column({
     nullable: true,
     type: 'varchar',
-    unique: true,
     length: 20
   })
   phone?: string;
 
   @Column({
     nullable: true,
-    default: 'viewer'
-  })
-  user_role?: 'admin' | 'manager' | 'editor' | 'viewer';
-
-  @Column({
-    nullable: true,
     type: 'timestamptz'
   })
-  // @CreateDateColumn()
+  @CreateDateColumn()
   created_at: Date;
 
   @Column({ 
     nullable: true,
     type: 'timestamptz'
   })
-  // @UpdateDateColumn()
+  @UpdateDateColumn()
   updated_at: Date;
 
   @Column({ 
@@ -77,8 +57,5 @@ export class User {
   })
   @DeleteDateColumn()
   deleted_at: Date;
-
-  // @OneToMany(() => Order, (order) => order.id)
-  // orders: Order[];
 
 }

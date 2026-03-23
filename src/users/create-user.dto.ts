@@ -10,7 +10,6 @@ export class CreateUserDto {
   
   @IsOptional()
   @IsString()
-  @MinLength(6)
   @MaxLength(90)
   @Transform(({ value }) => (value === '' ? undefined : value))
   readonly password: string;

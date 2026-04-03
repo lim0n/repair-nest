@@ -1,5 +1,6 @@
 import { Transform } from 'class-transformer';
 import { IsString, IsEmail, MinLength, MaxLength, IsOptional } from 'class-validator';
+import type { IRole } from './role.type';
 
 export class CreateUserDto {
   @IsOptional()
@@ -33,5 +34,5 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   @Transform(({ value }) => (value === '' ? undefined : value))
-  readonly user_role: 'admin' | 'manager' | 'editor' | 'viewer';
+  readonly user_role: IRole;
 }

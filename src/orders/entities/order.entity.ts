@@ -1,10 +1,15 @@
+import { OrderDetails } from 'src/order_details/entities/order_details.entity';
+import { User } from 'src/users/user.entity';
 import {
   Entity,
   PrimaryGeneratedColumn,
   Column,
   DeleteDateColumn,
   UpdateDateColumn,
-  CreateDateColumn
+  CreateDateColumn,
+  ManyToOne,
+  OneToMany,
+  JoinColumn
 }
 from 'typeorm';
 
@@ -15,6 +20,12 @@ export class Order {
 
   @Column({ nullable: true })
   user_id: number;
+
+  // @ManyToOne( () => User,
+  //             (user) => user.orders,
+  //             { onDelete: 'CASCADE' })
+  // @JoinColumn()
+  // user_id: User;
 
   @Column({
     nullable: true,
@@ -57,5 +68,12 @@ export class Order {
   })
   @DeleteDateColumn()
   deleted_at: Date;
+
+  // @OneToMany( () => OrderDetails,
+  //             (order_details) => order_details.order_id,
+  //             { onDelete: 'CASCADE',
+  //               cascade: [ 'remove', 'soft-remove']
+  //             })
+  // orderDetails: OrderDetails[];
 
 }

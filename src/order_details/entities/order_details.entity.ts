@@ -1,3 +1,4 @@
+import { Order } from 'src/orders/entities/order.entity';
 import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, ManyToOne, JoinColumn, UpdateDateColumn, CreateDateColumn } from 'typeorm';
 
 @Entity('order_details')
@@ -8,6 +9,12 @@ export class OrderDetails {
   @Column()
   order_id: number;
 
+  // @ManyToOne( () => Order,
+  //             (order) => order.orderDetails, 
+  //             { onDelete: 'CASCADE' })
+  // @JoinColumn()
+  // order_id: Order;
+
   @Column({
     nullable: true,
     type: 'text'
@@ -17,9 +24,15 @@ export class OrderDetails {
   @Column()
   author: number;
 
+  // @ManyToOne(() => User, (user) => user.orders, { 
+  //     onDelete: 'CASCADE' 
+  // })
+  // user_id: User;
+
   @Column({
     nullable: true,
-    type: 'boolean'
+    type: 'boolean',
+    default: false
    })
   hidden: boolean;
 

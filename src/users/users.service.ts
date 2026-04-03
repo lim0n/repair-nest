@@ -65,8 +65,12 @@ export class UsersService {
     // }
   }
 
-  async findAll(): Promise<User[]> {
-    return this.usersRepository.find({withDeleted: true});
+  async findAll(withDeleted?: boolean): Promise<User[]> {
+    const users = this.usersRepository.find({ withDeleted });
+    if (!users) {
+      throw new NotFoundException(`There is no users at all`);
+    }
+    return users;
   }
 
   async findOne(id: number): Promise<User> {
@@ -120,6 +124,14 @@ export class UsersService {
   async remove(id: string): Promise<void> {
     console.warn('FIRE remove, id = ', id);
     const result = await this.usersRepository.softDelete(Number(id));
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+  }
+
+  async hardRemove(id: string): Promise<void> {
+    console.warn('FIRE remove, id = ', id);
+    const result = await this.usersRepository.delete(Number(id));
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }

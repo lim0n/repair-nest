@@ -4,9 +4,14 @@ import {
   Column,
   DeleteDateColumn,
   UpdateDateColumn,
-  CreateDateColumn
+  CreateDateColumn,
+  BeforeInsert,
+  OneToMany
 }
 from 'typeorm';
+import type { IRole } from './role.type';
+import * as bcrypt from 'bcrypt';
+import { Order } from 'src/orders/entities/order.entity';
 
 @Entity('users')
 export class User {
@@ -24,9 +29,16 @@ export class User {
   @Column({
     nullable: true,
     type: 'varchar',
-    length: 90
+    length: 255
    })
   password?: string;
+
+  @BeforeInsert()
+  async hashPassword() {
+    if (this.password) {
+      this.password = await bcrypt.hash(this.password, 4);
+    }
+  }
 
   @Column({
     nullable: true,
@@ -55,7 +67,7 @@ export class User {
     nullable: true,
     default: 'viewer'
   })
-  user_role?: 'admin' | 'manager' | 'editor' | 'viewer';
+  user_role?: IRole;
 
   @Column({
     nullable: true,
@@ -78,7 +90,11 @@ export class User {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  // @OneToMany(() => Order, (order) => order.id)
+  // @OneToMany( () => Order,
+  //             (order) => order.user_id,
+  //             { 
+  //               onDelete: 'CASCADE',
+  //               cascade: [ 'remove', 'soft-remove']
+  //             })
   // orders: Order[];
-
 }

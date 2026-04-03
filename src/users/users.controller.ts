@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param, Delete, Put, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, Put, ParseIntPipe, Query } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
@@ -17,9 +17,9 @@ export class UsersController {
   }
 
   @Get()
-  findAll() {
-    console.warn('FIRE findall');
-    return this.usersService.findAll();
+  findAll( @Query('withDeleted') withDeleted: string ) {
+    console.warn('FIRE findall, withDeleted = ', withDeleted);
+    return this.usersService.findAll(JSON.parse(withDeleted));
   }
 
   @Get(':username')
@@ -50,5 +50,10 @@ export class UsersController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.usersService.remove(id);
+  }
+
+  @Delete('hard/:id')
+  hardRemove(@Param('id') id: string) {
+    return this.usersService.hardRemove(id);
   }
 }

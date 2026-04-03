@@ -10,6 +10,8 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
+import { RolesGuard } from './roles.guard';
+import { IUser } from 'src/users/user.interface';
 
 @Controller('auth')
 export class AuthController {
@@ -17,7 +19,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() signInDto: Record<string, any>) {
+  signIn(@Body() signInDto: Record<string, any>): Promise<IUser> {
     return this.authService.signIn(signInDto.username, signInDto.password);
   }
 
@@ -33,7 +35,7 @@ export class AuthController {
     return this.authService.signInByPhone(signInDto.phone, signInDto.password);
   }
 
-  @UseGuards(AuthGuard)
+  @UseGuards(AuthGuard, RolesGuard)
   @Get('profile')
   getProfile(@Request() req) {
     return req.user;

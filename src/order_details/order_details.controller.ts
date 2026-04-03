@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { OrderDetailsService } from './order_details.service';
 import { CreateOrderDetailsDto } from './dto/create-order_details.dto';
 import { UpdateOrderDetailsDto } from './dto/update-order_details.dto';
@@ -13,8 +13,9 @@ export class OrderDetailsController {
   }
 
   @Get()
-  findAll() {
-    return this.orderDetailsService.findAll();
+  findAll( @Query('withDeleted') withDeleted ) {
+    withDeleted = withDeleted || true;
+    return this.orderDetailsService.findAll(JSON.parse(withDeleted));
   }
 
   @Get(':id')
@@ -35,5 +36,10 @@ export class OrderDetailsController {
   @Delete(':id')
   remove(@Param('id') id: string) {
     return this.orderDetailsService.remove(+id);
+  }
+
+  @Delete('hard/:id')
+  hardRemove(@Param('id') id: string) {
+    return this.orderDetailsService.hardRemove(+id);
   }
 }

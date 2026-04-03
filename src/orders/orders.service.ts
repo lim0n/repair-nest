@@ -1,6 +1,7 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { CreateOrderDetailsDto } from 'src/order_details/dto/create-order_details.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
@@ -9,23 +10,14 @@ import { OrderDetailsService } from 'src/order_details/order_details.service';
 
 @Injectable()
 export class OrdersService {
-  // _orderDetailsService = inject(OrderDetailsService);
 
   constructor(
     @InjectRepository(Order)
     private readonly ordersRepository: Repository<Order>,
-
-    // @InjectRepository(OrderDetails)
-    // private ordersDetailsRepository: Repository<OrderDetails>
-
     private readonly _orderDetailsService: OrderDetailsService
   ) {}
 
   async create(createOrderDto: CreateOrderDto, ownerId?: number) {
-
-    console.warn('incom data', createOrderDto);
-    console.warn('incom details', createOrderDto['details']);
-
     const result = await this.ordersRepository.createQueryBuilder()
       .insert()
       .into(Order)
@@ -33,46 +25,34 @@ export class OrdersService {
       .returning("*") 
       .execute();
 
-    // console.warn('check #############', createOrderDto['details'], result.raw[0]?.id, result.raw.user_id, ownerId, 'and result is', Boolean(createOrderDto['details'] && result.raw.id && (result.raw.user_id || ownerId)) )
-    
+      console.warn('details', createOrderDto['details'], typeof createOrderDto['details']);
 
-
-    // if (createOrderDto['details'] && result.raw[0]?.id && (result.raw[0]?.user_id || ownerId)) {
-
-    //   this._orderDetailsService.create({
-    //     order_id: result.raw[0]?.id,
-    //     details: createOrderDto['details'],
-    //     author: ownerId ? ownerId : result.raw[0]?.user_id,
-    //     hidden: false
-    //   })
-    // }
-
-    console.log("Inserted order:", result); 
-
-
-        // (async function(){
-      const order_id = result.raw[0]?.id;
-      const details = createOrderDto['details'];
-      const author = ownerId ? ownerId : result.raw[0]?.user_id;
-      const hidden = false;
-
-      if ( details && order_id && author ) {
-        const detailsResult = await this._orderDetailsService.create({ order_id, details, author, hidden });
-        console.warn('WRFFFFFFFFFFFFFFFFFFFFFF', detailsResult);
+      if ( createOrderDto['details'] 
+            && result.raw[0]?.id 
+            && ownerId 
+              ? ownerId 
+              : result.raw[0]?.user_id ) {
+                const orderDetails = new CreateOrderDetailsDto();
+                orderDetails.order_id = result.raw[0]?.id;
+                orderDetails.details = createOrderDto['details'];
+                orderDetails.author = ownerId ? ownerId : result.raw[0]?.user_id;
+        await this._orderDetailsService.create(orderDetails);
       }
 
-    // })();
+      // const order_id = result.raw[0]?.id;
+      // const details = createOrderDto['details'];
+      // const author = ownerId ? ownerId : result.raw[0]?.user_id;
+      // const hidden = false;
 
+      // if ( details && order_id && author ) {
+      //   await this._orderDetailsService.create({ order_id, details, author, hidden });
+      // }
 
     return result.raw;
-
-
-    // const orderData = this.ordersRepository.create(createOrderDto);
-    // return this.ordersRepository.save(orderData);
   }
 
-  async findAll() {
-    const orders = this.ordersRepository.find();
+  async findAll(withDeleted?: boolean) {
+    const orders = this.ordersRepository.find({withDeleted});
     if (!orders) {
       throw new NotFoundException(`There is no orders at all`);
     }
@@ -102,6 +82,14 @@ export class OrdersService {
 
   async remove(id: number) {
     const result = await this.ordersRepository.softDelete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
+    return result;
+  }
+
+  async hardRemove(id: number) {
+    const result = await this.ordersRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }

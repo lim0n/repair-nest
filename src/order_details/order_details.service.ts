@@ -18,8 +18,8 @@ export class OrderDetailsService {
     return this.ordersDetailsRepository.save(order);
   }
 
-  async findAll(): Promise<OrderDetails[]> {
-    const ordersDetails = this.ordersDetailsRepository.find();
+  async findAll(withDeleted?: boolean): Promise<OrderDetails[]> {
+    const ordersDetails = this.ordersDetailsRepository.find({withDeleted});
     if (!ordersDetails) {
       throw new NotFoundException(`There is no order-details at all`);
     }
@@ -49,6 +49,13 @@ export class OrderDetailsService {
 
   async remove(id: number) {
     const result = await this.ordersDetailsRepository.softDelete(Number(id));
+    if (result.affected === 0) {
+      throw new NotFoundException(`Order-details with ID ${id} not found`);
+    }
+  }
+
+  async hardRemove(id: number) {
+    const result = await this.ordersDetailsRepository.delete(Number(id));
     if (result.affected === 0) {
       throw new NotFoundException(`Order-details with ID ${id} not found`);
     }

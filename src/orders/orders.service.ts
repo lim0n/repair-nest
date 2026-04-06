@@ -27,6 +27,13 @@ export class OrdersService {
 
       console.warn('details', createOrderDto['details'], typeof createOrderDto['details']);
 
+      // if (!ownerId && result.raw[0]?.user_id) {
+      //   console.warn('need to update order ###################', result.raw[0]);
+      //   this.update(result.raw[0]?.id, {
+      //     user_id: result.raw[0]?.user_id
+      //   });
+      // }
+
       if ( createOrderDto['details'] 
             && result.raw[0]?.id 
             && ownerId 

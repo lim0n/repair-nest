@@ -9,11 +9,18 @@ export class OrderDetails {
   @Column()
   order_id: number;
 
+  // @Column()
   // @ManyToOne( () => Order,
   //             (order) => order.orderDetails, 
-  //             { onDelete: 'CASCADE' })
+  //             { onDelete: 'CASCADE',
+  //               // orphanedRowAction: 'soft-delete'
+  //              })
   // @JoinColumn()
-  // order_id: Order;
+  // order_id: number;
+
+  @ManyToOne(() => Order, { onDelete: 'CASCADE'})
+  @JoinColumn({ name: "order_id" })
+  order: Order;
 
   @Column({
     nullable: true,

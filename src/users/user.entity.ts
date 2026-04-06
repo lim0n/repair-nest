@@ -90,11 +90,11 @@ export class User {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  // @OneToMany( () => Order,
-  //             (order) => order.user_id,
-  //             { 
-  //               onDelete: 'CASCADE',
-  //               cascade: [ 'remove', 'soft-remove']
-  //             })
-  // orders: Order[];
+  @OneToMany( () => Order,
+              (order) => order.user_id,
+              { 
+                onDelete: 'CASCADE',
+                cascade: true
+              })
+  orders: Order[];
 }

@@ -21,11 +21,18 @@ export class Order {
   @Column({ nullable: true })
   user_id: number;
 
+  // @Column({ nullable: true })
   // @ManyToOne( () => User,
   //             (user) => user.orders,
-  //             { onDelete: 'CASCADE' })
+  //             { onDelete: 'CASCADE',
+  //               // orphanedRowAction: 'soft-delete'
+  //              })
   // @JoinColumn()
-  // user_id: User;
+  // user_id: number;
+
+  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @JoinColumn({ name: "user_id" })
+  user: User;
 
   @Column({
     nullable: true,
@@ -69,11 +76,12 @@ export class Order {
   @DeleteDateColumn()
   deleted_at: Date;
 
-  // @OneToMany( () => OrderDetails,
-  //             (order_details) => order_details.order_id,
-  //             { onDelete: 'CASCADE',
-  //               cascade: [ 'remove', 'soft-remove']
-  //             })
-  // orderDetails: OrderDetails[];
+  @OneToMany( () => OrderDetails,
+              (order_details) => order_details.order_id,
+              { 
+                onDelete: 'CASCADE',
+                cascade: true
+              })
+  orderDetails: OrderDetails[];
 
 }

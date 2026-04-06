@@ -5,7 +5,6 @@ import { CreateOrderDetailsDto } from 'src/order_details/dto/create-order_detail
 import { InjectRepository } from '@nestjs/typeorm';
 import { Order } from './entities/order.entity';
 import { Repository } from 'typeorm';
-import { OrderDetails } from 'src/order_details/entities/order_details.entity';
 import { OrderDetailsService } from 'src/order_details/order_details.service';
 
 @Injectable()
@@ -25,35 +24,13 @@ export class OrdersService {
       .returning("*") 
       .execute();
 
-      console.warn('details', createOrderDto['details'], typeof createOrderDto['details']);
-
-      // if (!ownerId && result.raw[0]?.user_id) {
-      //   console.warn('need to update order ###################', result.raw[0]);
-      //   this.update(result.raw[0]?.id, {
-      //     user_id: result.raw[0]?.user_id
-      //   });
-      // }
-
-      if ( createOrderDto['details'] 
-            && result.raw[0]?.id 
-            && ownerId 
-              ? ownerId 
-              : result.raw[0]?.user_id ) {
-                const orderDetails = new CreateOrderDetailsDto();
-                orderDetails.order_id = result.raw[0]?.id;
-                orderDetails.details = createOrderDto['details'];
-                orderDetails.author = ownerId ? ownerId : result.raw[0]?.user_id;
+      if ( createOrderDto['details'] !== null && result.raw[0]?.id ) {
+        const orderDetails = new CreateOrderDetailsDto();
+        orderDetails.order_id = result.raw[0]?.id;
+        orderDetails.details = createOrderDto['details'];
+        orderDetails.author = ownerId ? ownerId : result.raw[0]?.user_id;
         await this._orderDetailsService.create(orderDetails);
       }
-
-      // const order_id = result.raw[0]?.id;
-      // const details = createOrderDto['details'];
-      // const author = ownerId ? ownerId : result.raw[0]?.user_id;
-      // const hidden = false;
-
-      // if ( details && order_id && author ) {
-      //   await this._orderDetailsService.create({ order_id, details, author, hidden });
-      // }
 
     return result.raw;
   }
@@ -88,7 +65,17 @@ export class OrdersService {
   }
 
   async remove(id: number) {
-    const result = await this.ordersRepository.softDelete(id);
+    let result;
+
+    const order = await this.ordersRepository.findOne({
+      where: { id },
+      relations: [ 'order-details' ]
+    });
+
+    if (order !== null) {
+      result = await this.ordersRepository.softRemove(order);
+    }
+
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }

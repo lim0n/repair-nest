@@ -23,6 +23,7 @@ export class CreateUserDto {
   @IsOptional()
   @IsString()
   @MaxLength(90)
+  @Transform(({ value }) => (value === '' ? undefined : value))
   readonly name: string;
 
   @IsOptional()

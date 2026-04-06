@@ -21,16 +21,9 @@ export class Order {
   @Column({ nullable: true })
   user_id: number;
 
-  // @Column({ nullable: true })
-  // @ManyToOne( () => User,
-  //             (user) => user.orders,
-  //             { onDelete: 'CASCADE',
-  //               // orphanedRowAction: 'soft-delete'
-  //              })
-  // @JoinColumn()
-  // user_id: number;
-
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
+  @ManyToOne( () => User,
+              (user) => user.orders,
+              {onDelete: 'CASCADE'} )
   @JoinColumn({ name: "user_id" })
   user: User;
 
@@ -77,11 +70,8 @@ export class Order {
   deleted_at: Date;
 
   @OneToMany( () => OrderDetails,
-              (order_details) => order_details.order_id,
-              { 
-                onDelete: 'CASCADE',
-                cascade: true
-              })
+              (order_details) => order_details.order,
+              {cascade: ["soft-remove"]} )
   orderDetails: OrderDetails[];
 
 }

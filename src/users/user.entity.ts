@@ -6,12 +6,14 @@ import {
   UpdateDateColumn,
   CreateDateColumn,
   BeforeInsert,
-  OneToMany
+  OneToMany,
+  BeforeUpdate
 }
 from 'typeorm';
 import type { IRole } from './role.type';
 import * as bcrypt from 'bcrypt';
 import { Order } from 'src/orders/entities/order.entity';
+// import { OrderDetails } from 'src/order_details/entities/order_details.entity';
 
 @Entity('users')
 export class User {
@@ -34,6 +36,7 @@ export class User {
   password?: string;
 
   @BeforeInsert()
+  @BeforeUpdate()
   async hashPassword() {
     if (this.password) {
       this.password = await bcrypt.hash(this.password, 4);
@@ -73,14 +76,14 @@ export class User {
     nullable: true,
     type: 'timestamptz'
   })
-  // @CreateDateColumn()
+  @CreateDateColumn()
   created_at: Date;
 
   @Column({ 
     nullable: true,
     type: 'timestamptz'
   })
-  // @UpdateDateColumn()
+  @UpdateDateColumn()
   updated_at: Date;
 
   @Column({ 
@@ -91,10 +94,12 @@ export class User {
   deleted_at: Date;
 
   @OneToMany( () => Order,
-              (order) => order.user_id,
-              { 
-                onDelete: 'CASCADE',
-                cascade: true
-              })
+              (order) => order.user,
+              {cascade: ["soft-remove"]} )
   orders: Order[];
+
+  // @OneToMany( () => OrderDetails,
+  //             (orderDetails) => orderDetails.user,
+  //             {cascade: ["soft-remove"]} )
+  // messages: OrderDetails[];
 }

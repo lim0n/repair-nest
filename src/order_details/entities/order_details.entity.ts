@@ -1,5 +1,15 @@
 import { Order } from 'src/orders/entities/order.entity';
-import { Entity, PrimaryGeneratedColumn, Column, DeleteDateColumn, ManyToOne, JoinColumn, UpdateDateColumn, CreateDateColumn } from 'typeorm';
+// import { User } from 'src/users/user.entity';
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Column,
+  DeleteDateColumn,
+  ManyToOne,
+  JoinColumn,
+  UpdateDateColumn,
+  CreateDateColumn
+} from 'typeorm';
 
 @Entity('order_details')
 export class OrderDetails {
@@ -9,16 +19,9 @@ export class OrderDetails {
   @Column()
   order_id: number;
 
-  // @Column()
-  // @ManyToOne( () => Order,
-  //             (order) => order.orderDetails, 
-  //             { onDelete: 'CASCADE',
-  //               // orphanedRowAction: 'soft-delete'
-  //              })
-  // @JoinColumn()
-  // order_id: number;
-
-  @ManyToOne(() => Order, { onDelete: 'CASCADE'})
+  @ManyToOne( () => Order,
+              (order) => order.orderDetails,
+              {onDelete: 'CASCADE'} )
   @JoinColumn({ name: "order_id" })
   order: Order;
 
@@ -31,10 +34,11 @@ export class OrderDetails {
   @Column()
   author: number;
 
-  // @ManyToOne(() => User, (user) => user.orders, { 
-  //     onDelete: 'CASCADE' 
-  // })
-  // user_id: User;
+  // @ManyToOne( () => User,
+  //             (user) => user.messages,
+  //             {onDelete: 'CASCADE'})
+  // @JoinColumn({ name: "user_id" })
+  // user: User;
 
   @Column({
     nullable: true,

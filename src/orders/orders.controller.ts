@@ -1,4 +1,13 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  Query
+} from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
@@ -10,7 +19,7 @@ export class OrdersController {
   @Post()
   create(@Body() createOrderDto: CreateOrderDto) {
     /** TODO: проверить авторизованность и подставить вторым параметром id юзера 
-     * если юзер не авторизован - авторизовать егго как вновь созданного по createOrderDto.user_id
+     * если юзер не авторизован - авторизовать егго как вновь созданного по returned.user_id
     */
     return this.ordersService.create(createOrderDto);
   }

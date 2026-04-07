@@ -3,6 +3,7 @@ import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import { IUser } from '../users/user.interface';
 import * as bcrypt from 'bcrypt';
+import type { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -13,9 +14,12 @@ export class AuthService {
 
   async signIn(
     username: string,
-    pass: string
-  ): Promise<Pick<IUser, 'access_token' | 'user_role'>> {
+    pass: string,
+    request: Request
+  ): Promise<{'access_token', 'refresh_token'}> {
     const user = await this.usersService.findUserByName(username);
+    const clientFingerprint = request.headers['user-agent'];
+    
     let isMatch;
 
     if (user?.password) {
@@ -28,10 +32,14 @@ export class AuthService {
       throw new UnauthorizedException();
     }
 
-    const payload = { sub: user.id, username: user.username };
+    const payload = { 
+      sub: user.id,
+      role: user.user_role
+    };
+
     return {
       access_token: await this.jwtService.signAsync(payload),
-      user_role: user.user_role
+      refresh_token: await this.jwtService.signAsync({...payload, clientFingerprint}, { expiresIn: '7d' })
     };
   }
 

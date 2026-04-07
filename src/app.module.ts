@@ -5,19 +5,13 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderDetailsModule } from './order_details/order_details.module';
 import { OrdersModule } from './orders/orders.module';
+import { ConfigModule } from '@nestjs/config';
+import databaseConfig from './config/database.config';
 
 @Module({
   imports: [
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'backend', 
-      password: 'backend', 
-      database: 'backend', 
-      entities: [__dirname + '/**/*.entity{.ts,.js}'],
-      synchronize: true, 
-    }),
+    ConfigModule.forRoot(),
+    TypeOrmModule.forRoot(databaseConfig()),
     RepairRequestModule,
     AuthModule,
     UsersModule,

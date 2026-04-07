@@ -11,16 +11,23 @@ import {
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { User } from './user.entity';
 
+@ApiTags('Пользователи')
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
+  @ApiOperation({ summary: 'Создание пользователя' })
+  @ApiResponse({ status: 200, type: User})
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);
   }
 
+  @ApiOperation({ summary: 'Получение всех пользователей' })
+  @ApiResponse({ status: 200, type: [User]})
   @Get()
   findAll( @Query('withDeleted') withDeleted: string ) {
     return this.usersService.findAll(JSON.parse(withDeleted));

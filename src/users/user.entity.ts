@@ -13,13 +13,16 @@ from 'typeorm';
 import type { IRole } from './role.type';
 import * as bcrypt from 'bcrypt';
 import { Order } from 'src/orders/entities/order.entity';
+import { ApiProperty } from '@nestjs/swagger';
 // import { OrderDetails } from 'src/order_details/entities/order_details.entity';
 
 @Entity('users')
 export class User {
+  @ApiProperty({ example: 1, description: 'Уникальный идентификатор'})
   @PrimaryGeneratedColumn()
   id?: number;
 
+  @ApiProperty({ example: 'Neo', description: 'Логин'})
   @Column({
     nullable: true,
     type: 'varchar',
@@ -28,6 +31,7 @@ export class User {
   })
   username?: string;
 
+  @ApiProperty({ example: 'Matr1x', description: 'Пароль'})
   @Column({
     nullable: true,
     type: 'varchar',
@@ -43,6 +47,7 @@ export class User {
     }
   }
 
+  @ApiProperty({ example: 'Neo@matrix.com', description: 'Адрес электронной почты'})
   @Column({
     nullable: true,
     type: 'varchar',
@@ -51,6 +56,7 @@ export class User {
   })
   email?: string;
 
+  @ApiProperty({ example: 'Томас Андерсон', description: 'Полное имя пользователя'})
   @Column({ 
     nullable: true,
     type: 'varchar',
@@ -58,6 +64,7 @@ export class User {
   })
   name?: string;
 
+  @ApiProperty({ example: '+79168048533', description: 'Номер телефона'})
   @Column({
     nullable: true,
     type: 'varchar',
@@ -66,6 +73,7 @@ export class User {
   })
   phone?: string;
 
+  @ApiProperty({ example: 'Manager', description: 'Роль пользователя'})
   @Column({
     nullable: true,
     default: 'viewer'

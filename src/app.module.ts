@@ -10,7 +10,9 @@ import databaseConfig from './config/database.config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({
+      envFilePath: `.${process.env.NODE_ENV}.env`
+    }),
     TypeOrmModule.forRoot(databaseConfig()),
     RepairRequestModule,
     AuthModule,

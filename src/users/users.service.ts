@@ -5,6 +5,8 @@ import { Repository } from 'typeorm';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
 import * as bcrypt from 'bcrypt';
+import { Role } from 'src/roles/roles.entity';
+import { RolesService } from 'src/roles/roles.service';
 
 @Injectable()
 export class UsersService {
@@ -12,10 +14,12 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    private rolesService: RolesService
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User | unknown> {
     const user = this.usersRepository.create(createUserDto);
+    // const role = this.rolesService.getRoleByName("viewer");
     return await this.usersRepository.save(user);
   }
 

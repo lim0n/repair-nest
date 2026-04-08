@@ -7,13 +7,16 @@ import {
   CreateDateColumn,
   BeforeInsert,
   OneToMany,
-  BeforeUpdate
+  BeforeUpdate,
+  ManyToMany,
+  JoinTable
 }
 from 'typeorm';
 import type { IRole } from './role.type';
 import * as bcrypt from 'bcrypt';
 import { Order } from 'src/orders/entities/order.entity';
 import { ApiProperty } from '@nestjs/swagger';
+import { Role } from 'src/roles/roles.entity';
 // import { OrderDetails } from 'src/order_details/entities/order_details.entity';
 
 @Entity('users')
@@ -105,6 +108,38 @@ export class User {
               (order) => order.user,
               {cascade: ["soft-remove"]} )
   orders: Order[];
+
+
+
+
+
+
+
+  // @ManyToMany( () => Role,
+  //             //  (role) => role.users,
+  //              {cascade: true} )
+  // @JoinTable({ name: 'user_roles' })  
+  // // @JoinTable()
+  // roles: Role[];
+
+  @ManyToMany(() => Role)
+  @JoinTable({
+      name: "user_roles", // table name for the junction table of this relation
+      joinColumn: {
+          name: "user_id",
+          referencedColumnName: "id"
+      },
+      inverseJoinColumn: {
+          name: "role_id",
+          referencedColumnName: "id"
+      }
+  })
+  roles: Role[];
+
+
+
+
+
 
   // @OneToMany( () => OrderDetails,
   //             (orderDetails) => orderDetails.user,

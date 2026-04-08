@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderDetailsModule } from './order_details/order_details.module';
 import { OrdersModule } from './orders/orders.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { RolesModule } from './roles/roles.module';
 import databaseConfig from './config/database.config';
 
 @Module({
@@ -18,7 +19,8 @@ import databaseConfig from './config/database.config';
     AuthModule,
     UsersModule,
     OrdersModule,
-    OrderDetailsModule
+    OrderDetailsModule,
+    RolesModule
   ],
   controllers: [],
   providers: [ConfigService],

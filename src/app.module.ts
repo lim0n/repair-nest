@@ -5,7 +5,7 @@ import { UsersModule } from './users/users.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { OrderDetailsModule } from './order_details/order_details.module';
 import { OrdersModule } from './orders/orders.module';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import databaseConfig from './config/database.config';
 
 @Module({
@@ -21,6 +21,6 @@ import databaseConfig from './config/database.config';
     OrderDetailsModule
   ],
   controllers: [],
-  providers: [],
+  providers: [ConfigService],
 })
 export class AppModule {}

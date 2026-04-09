@@ -44,7 +44,7 @@ export class User {
 
   @BeforeInsert()
   @BeforeUpdate()
-  async hashPassword() {
+  async hashPassword?() {
     if (this.password) {
       this.password = await bcrypt.hash(this.password, 4);
     }
@@ -122,17 +122,25 @@ export class User {
   // // @JoinTable()
   // roles: Role[];
 
-  @ManyToMany(() => Role)
+  // @ManyToMany(() => Role)
+  // @JoinTable({
+  //     name: "user_roles", // table name for the junction table of this relation
+  //     joinColumn: {
+  //         name: "user_id",
+  //         referencedColumnName: "id"
+  //     },
+  //     inverseJoinColumn: {
+  //         name: "role_id",
+  //         referencedColumnName: "id"
+  //     }
+  // })
+  // roles: Role[];
+
+  @ManyToMany(() => Role, (role) => role.users, {cascade: true})
   @JoinTable({
-      name: "user_roles", // table name for the junction table of this relation
-      joinColumn: {
-          name: "user_id",
-          referencedColumnName: "id"
-      },
-      inverseJoinColumn: {
-          name: "role_id",
-          referencedColumnName: "id"
-      }
+      name: "user_roles", // optional: custom name for junction table
+      joinColumn: { name: "user_id", referencedColumnName: "id" },
+      inverseJoinColumn: { name: "role_id", referencedColumnName: "id" }
   })
   roles: Role[];
 

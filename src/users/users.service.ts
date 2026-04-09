@@ -18,8 +18,12 @@ export class UsersService {
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User | unknown> {
-    const user = this.usersRepository.create(createUserDto);
-    // const role = this.rolesService.getRoleByName("viewer");
+    const { user_role, ...userData } = createUserDto;
+    const role = await this.rolesService.getRoleByName(user_role || "viewer");
+    if (role) {
+      userData['roles'] = [role as Role];
+    }
+    const user = await this.usersRepository.create(userData);
     return await this.usersRepository.save(user);
   }
 
@@ -32,19 +36,31 @@ export class UsersService {
   }
 
   async findOne(id: number): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ id });
+    const user = await this.usersRepository.findOne({ 
+      where: { id },
+      relations: {
+        roles: true
+      }
+    });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
-    return user;
+    const { password, ...result } = user;
+    return result;
   }
 
   async findUserByName(username: string): Promise<User> {
-    const user = await this.usersRepository.findOneBy({ username });
+    const user = await this.usersRepository.findOne({ 
+      where: { username },
+      relations: {
+        roles: true
+      }
+    });
     if (!user) {
       throw new NotFoundException(`User with username ${username} not found`);
     }
-    return user;
+    const { password, ...result } = user;
+    return result;
   }
 
   async findUserByEmail(email: string): Promise<User> {

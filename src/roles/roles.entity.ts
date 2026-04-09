@@ -11,7 +11,7 @@ export class Role {
   @ApiProperty({ example: 'ADMIN', description: 'Роль пользователя'})
   @Column({ 
     type: 'varchar',
-    // unique: true,
+    unique: true,
     length: 20
   })
   name: string;
@@ -19,34 +19,11 @@ export class Role {
   @ApiProperty({ example: 'Администратор', description: 'Описание роли'})
   @Column({ 
     type: 'varchar',
-    length: 90
+    length: 90,
+    nullable: true
   })
   description: string;
 
-
-
-
-
-  // @Column()
-  // user_id: number;
-
-  // @ManyToMany( () => User,
-  //              (user) => user.roles )
-  // @JoinTable()
-  // // @JoinTable({ name: 'user_roles' })
-  // users: User[];
-
-  @ManyToMany(() => User)
-  @JoinTable({
-      name: "user_roles", // table name for the junction table of this relation
-      joinColumn: {
-          name: "role_id",
-          referencedColumnName: "id"
-      },
-      inverseJoinColumn: {
-          name: "user_id",
-          referencedColumnName: "id"
-      }
-  })
+  @ManyToMany(() => User, (user) => user.roles)
   users: User[];
 }

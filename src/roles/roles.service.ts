@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './roles.entity';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -19,5 +19,20 @@ export class RolesService {
 
   async getRoleByName(name: string) {
     return await this.roleRepository.findOneBy({name});
+  }
+
+  async findAll(): Promise<Role[]> {
+    const roles = this.roleRepository.find();
+    if (!roles) {
+      throw new NotFoundException(`There is no roles at all`);
+    }
+    return roles;
+  }
+
+  async hardRemove(id: number): Promise<void> {
+    const result = await this.roleRepository.delete(id);
+    if (result.affected === 0) {
+      throw new NotFoundException(`User with ID ${id} not found`);
+    }
   }
 }

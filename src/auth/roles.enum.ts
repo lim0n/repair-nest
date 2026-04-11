@@ -1,4 +1,4 @@
-export enum Role {
+export enum IRole {
   Admin = 'admin',
   Manger = 'manager',
   Editor = 'editor',

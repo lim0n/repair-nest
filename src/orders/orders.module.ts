@@ -7,11 +7,20 @@ import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmExceptionFilter } from 'src/filters/typeorm-exception.filter';
 import { OrderDetailsService } from 'src/order_details/order_details.service';
 import { OrderDetails } from 'src/order_details/entities/order_details.entity';
+import { UsersModule } from 'src/users/users.module';
+import { AuthModule } from 'src/auth/auth.module';
+import { JwtModule } from '@nestjs/jwt';
+import jwtConfig from 'src/config/jwt.config';
+import { RolesModule } from 'src/roles/roles.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order]),
-    TypeOrmModule.forFeature([OrderDetails])
+    TypeOrmModule.forFeature([OrderDetails]),
+    UsersModule,
+    JwtModule.registerAsync(jwtConfig.asProvider()),
+    AuthModule,
+    RolesModule
   ],
   providers: [
     OrdersService,

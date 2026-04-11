@@ -25,6 +25,12 @@ export class UsersService {
     }
     const user = await this.usersRepository.create(userData);
     return await this.usersRepository.save(user);
+
+    // await dataSource
+    // .createQueryBuilder()
+    // .relation(User, "roles")
+    // .of(userId) // The ID of the user
+    // .add(roleId); // The ID of the role to add
   }
 
   async findAll(withDeleted?: boolean): Promise<User[]> {
@@ -59,8 +65,9 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with username ${username} not found`);
     }
-    const { password, ...result } = user;
-    return result;
+    // const { password, ...result } = user;
+    // return result;
+    return user;
   }
 
   async findUserByEmail(email: string): Promise<User> {
@@ -79,13 +86,21 @@ export class UsersService {
     return user;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User | undefined> {
+  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user = {...updateUserDto};
     if (user.password && typeof user.password === 'string') {
       user.password = await bcrypt.hash(user.password, 4);
     }
     await this.usersRepository.update({id}, user);
     return this.findOne(id);
+  }
+
+  async save(dto: UpdateUserDto): Promise<User> {
+    const user = {...dto};
+    if (user.password && typeof user.password === 'string') {
+      user.password = await bcrypt.hash(user.password, 4);
+    }
+    return await this.usersRepository.save(user);
   }
 
   async remove(id: number): Promise<void> {

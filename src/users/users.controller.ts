@@ -6,13 +6,18 @@ import {
   Param,
   Delete,
   Put,
-  Query
+  Query,
+  UseGuards
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { User } from './user.entity';
+import { AuthGuard } from 'src/auth/auth.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { IRole } from 'src/auth/roles.enum';
+import { RolesGuard } from 'src/auth/roles.guard';
 
 @ApiTags('Пользователи')
 @Controller('users')
@@ -28,6 +33,8 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Получение всех пользователей' })
   @ApiResponse({ status: 200, type: [User]})
+  @Roles(IRole.Viewer)
+  @UseGuards(AuthGuard, RolesGuard)
   @Get()
   findAll( @Query('withDeleted') withDeleted: string ) {
     return this.usersService.findAll(JSON.parse(withDeleted));

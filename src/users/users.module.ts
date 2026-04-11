@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
@@ -8,12 +8,12 @@ import { TypeOrmExceptionFilter } from 'src/filters/typeorm-exception.filter';
 import { Role } from 'src/roles/roles.entity';
 import { UserRoles } from 'src/roles/user-roles.entity';
 import { RolesService } from 'src/roles/roles.service';
+import { AuthModule } from 'src/auth/auth.module';
 
 @Module({
   imports: [
-    TypeOrmModule.forFeature([User]),
-    TypeOrmModule.forFeature([Role]),
-    // TypeOrmModule.forFeature([UserRoles])
+    TypeOrmModule.forFeature([User, Role]),
+    forwardRef(() => AuthModule) // защита от циклических зависимостей
   ],
   providers: [
     UsersService,
@@ -23,7 +23,7 @@ import { RolesService } from 'src/roles/roles.service';
       useClass: TypeOrmExceptionFilter,
     },
   ],
-  exports: [ UsersService ],
-  controllers: [UsersController]
+  controllers: [UsersController],
+  exports: [ UsersService ]
 })
 export class UsersModule {}

@@ -18,7 +18,6 @@ export class OrderDetailsController {
 
   @Post()
   create(@Body() createOrderDetailsDto: CreateOrderDetailsDto) {
-    console.warn('fire create order-details');
     return this.orderDetailsService.create(createOrderDetailsDto);
   }
 

@@ -1,73 +1,77 @@
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
-import { IUser } from '../users/user.interface';
 import * as bcrypt from 'bcrypt';
 import type { Request } from 'express';
+import { User } from 'src/users/user.entity';
 
 @Injectable()
 export class AuthService {
-  constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService
-) {}
+    constructor(
+      private usersService: UsersService,
+      private jwtService: JwtService
+  ) {}
 
-  async signIn(
-    username: string,
-    pass: string,
-    request: Request
-  ): Promise<{'access_token', 'refresh_token'}> {
-    const user = await this.usersService.findUserByName(username);
-    const clientFingerprint = request.headers['user-agent'];
-    
-    let isMatch;
+  readonly bcrypt = bcrypt;
 
-    if (user?.password) {
-      isMatch = await bcrypt.compare(pass, user.password);
-    } else if (user?.password === null && pass === '') {
-      isMatch = true
-    }
-
-    if (!isMatch) {
-      throw new UnauthorizedException();
-    }
-
+  async getTokens(user: User): Promise<{'access_token', 'refresh_token'}> {
     const payload = { 
       sub: user.id,
-      role: user.user_role
+      roles: user.roles
     };
 
     return {
       access_token: await this.jwtService.signAsync(payload),
-      refresh_token: await this.jwtService.signAsync({...payload, clientFingerprint}, { expiresIn: '7d' })
+      refresh_token: await this.jwtService.signAsync(payload)
     };
+  }
+
+  private async validateUser(user: User, password?: string): Promise<User> {
+    let isMatch;
+
+    if (user.password && password) {
+      isMatch = await this.bcrypt.compare(password, user.password);
+    } else if (user?.password === null && password === undefined) { // когда приходим сюда из создания ззаказа
+      isMatch = true
+    }
+
+    if (isMatch) {
+      return user;
+    }
+
+    throw new UnauthorizedException();
+  }
+
+  async signIn(
+    dto: User,
+  ): Promise<{'access_token', 'refresh_token'}> {
+    if (!dto.username) { 
+      throw new UnauthorizedException();
+    }
+    const candidate = await this.usersService.findUserByName(dto.username);
+    const user = await this.validateUser(candidate, dto.password);
+    return this.getTokens(user);
   }
 
   async signInByEmail(
-    email: string,
-    pass: string
-  ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findUserByEmail(email);
-    if (user?.password !== pass) {
+    dto: User,
+  ): Promise<{'access_token', 'refresh_token'}> {
+    if (!dto.email) { 
       throw new UnauthorizedException();
     }
-    const payload = { sub: user.id, username: user.username };
-    return {
-      access_token: await this.jwtService.signAsync(payload)
-    };
+    const candidate = await this.usersService.findUserByEmail(dto.email);
+    const user = await this.validateUser(candidate, dto.password);
+    return this.getTokens(user);
   }
 
   async signInByPhone(
-    phone: string,
-    pass: string
-  ): Promise<{ access_token: string }> {
-    const user = await this.usersService.findUserByPhone(phone);
-    if (user?.password !== pass) {
+    dto: User
+  ): Promise<{'access_token', 'refresh_token'}> {
+    if (!dto.phone) { 
       throw new UnauthorizedException();
     }
-    const payload = { sub: user.id, username: user.username };
-    return {
-      access_token: await this.jwtService.signAsync(payload)
-    };
+    const candidate = await this.usersService.findUserByPhone(dto.phone);
+    const user = await this.validateUser(candidate, dto.password);
+    return this.getTokens(user);
   }
 }

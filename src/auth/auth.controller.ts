@@ -11,31 +11,32 @@ import {
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.guard';
+import { ApiTags } from '@nestjs/swagger';
+import { CreateUserDto } from 'src/users/create-user.dto';
+import { User } from 'src/users/user.entity';
 // import { IUser } from 'src/users/user.interface';
 
+@ApiTags('Авторизация')
 @Controller('auth')
 export class AuthController {
   constructor(private authService: AuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(
-    @Body() signInDto: Record<string, any>,
-    @Request() request
-  ): Promise<{'access_token', 'refresh_token'}> {
-    return this.authService.signIn(signInDto.username, signInDto.password, request);
+  signIn(@Body() signInDto: User) {
+    return this.authService.signIn(signInDto);
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('login/by-email')
-  signInByEmail(@Body() signInDto: Record<string, any>) {
-    return this.authService.signInByEmail(signInDto.email, signInDto.password);
+  signInByEmail(@Body() signInDto: User) {
+    return this.authService.signInByEmail(signInDto);
   }
 
   @HttpCode(HttpStatus.OK)
   @Post('login/by-phone')
-  signInByPhone(@Body() signInDto: Record<string, any>) {
-    return this.authService.signInByPhone(signInDto.phone, signInDto.password);
+  signInByPhone(@Body() signInDto: User) {
+    return this.authService.signInByPhone(signInDto);
   }
 
   @UseGuards(AuthGuard, RolesGuard)

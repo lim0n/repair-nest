@@ -6,11 +6,13 @@ import {
   Patch,
   Param,
   Delete,
-  Query
+  Query,
+  UsePipes
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
+import { InfoValidationPipe } from 'src/pipes/info-validation.pipe';
 
 @Controller('orders')
 export class OrdersController {

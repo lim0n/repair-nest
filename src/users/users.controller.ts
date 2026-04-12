@@ -7,7 +7,8 @@ import {
   Delete,
   Put,
   Query,
-  UseGuards
+  UseGuards,
+  UsePipes
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
@@ -18,6 +19,7 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { IRole } from 'src/auth/roles.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
+import { InfoValidationPipe } from 'src/pipes/info-validation.pipe';
 
 @ApiTags('Пользователи')
 @Controller('users')
@@ -26,6 +28,7 @@ export class UsersController {
 
   @ApiOperation({ summary: 'Создание пользователя' })
   @ApiResponse({ status: 200, type: User})
+  // @UsePipes(ValidationPipe)
   @Post()
   create(@Body() createUserDto: CreateUserDto) {
     return this.usersService.create(createUserDto);

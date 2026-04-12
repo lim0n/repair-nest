@@ -7,7 +7,7 @@ export class CreateOrderDto {
   readonly user_id: number;
 
   @IsOptional()
-  @IsEmail()
+  @IsEmail({},{ message: 'Ошибка в адресе электронной почты' })
   @Transform(({ value }) => (value === '' ? undefined : value))
   readonly email: string;
 

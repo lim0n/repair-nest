@@ -9,6 +9,7 @@ import { OrderDetailsService } from 'src/order_details/order_details.service';
 import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { RolesService } from 'src/roles/roles.service';
+import type { Request } from 'express';
 
 @Injectable()
 export class OrdersService {
@@ -22,7 +23,7 @@ export class OrdersService {
     private readonly _rolesService: RolesService
   ) {}
 
-  async create(createOrderDto: CreateOrderDto): Promise<CreateOrderDto & 'tokens'> {
+  async create(createOrderDto: CreateOrderDto, req: Request): Promise<CreateOrderDto & 'tokens'> {
     const dtoHasNoUser = !Boolean(createOrderDto.user_id);
     let tokens = {};
 
@@ -48,7 +49,7 @@ export class OrdersService {
         user.roles.push(role)
         user = await this._usersService.save(user);
       }
-      tokens = await this._authService.getTokens(user);
+      tokens = await this._authService.getTokens(user, req);
     }
 
     return {...result.raw[0], tokens};

@@ -3,6 +3,7 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { Role } from './roles.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { UpdateRoleDto } from './dto/update-role.dto';
 
 @Injectable()
 export class RolesService {
@@ -27,6 +28,10 @@ export class RolesService {
       throw new NotFoundException(`There is no roles at all`);
     }
     return roles;
+  }
+
+  async update(name: string, updateRoleDto: UpdateRoleDto) {
+    return await this.roleRepository.update({name}, updateRoleDto);
   }
 
   async hardRemove(id: number): Promise<void> {

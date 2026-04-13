@@ -7,7 +7,8 @@ import {
   Param,
   Delete,
   Query,
-  UsePipes
+  UsePipes,
+  Request
 } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { CreateOrderDto } from './dto/create-order.dto';
@@ -19,8 +20,8 @@ export class OrdersController {
   constructor(private readonly ordersService: OrdersService) {}
 
   @Post()
-  create(@Body() createOrderDto: CreateOrderDto) {
-    return this.ordersService.create(createOrderDto);
+  create(@Body() createOrderDto: CreateOrderDto, @Request() req) {
+    return this.ordersService.create(createOrderDto, req);
   }
 
   @Get()

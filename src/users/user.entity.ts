@@ -17,6 +17,7 @@ import * as bcrypt from 'bcrypt';
 import { Order } from 'src/orders/entities/order.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
+import { RefreshToken } from './user-refresh-token.entity';
 
 @Entity('users')
 export class User {
@@ -107,6 +108,11 @@ export class User {
               (order) => order.user,
               {cascade: ["soft-remove"]} )
   orders: Order[];
+
+  @OneToMany( () => Order,
+            (order) => order.user,
+            {cascade: ["soft-remove"]} )
+  refreshTokens: RefreshToken[];
 
   @ManyToMany(() => Role, (role) => role.users, {cascade: true})
   @JoinTable({

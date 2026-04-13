@@ -37,7 +37,7 @@ export class UsersController {
   @ApiOperation({ summary: 'Получение всех пользователей' })
   @ApiResponse({ status: 200, type: [User]})
   @Roles(IRole.Viewer)
-  @UseGuards(AuthGuard, RolesGuard)
+  // @UseGuards(AuthGuard, RolesGuard)
   @Get()
   findAll( @Query('withDeleted') withDeleted: string ) {
     return this.usersService.findAll(JSON.parse(withDeleted));

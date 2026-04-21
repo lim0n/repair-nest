@@ -123,4 +123,8 @@ export class AuthService {
     const user = await this.validateUser(candidate, dto.password);
     return this.getTokens(user, req);
   }
+
+  async getProfile(request) {
+    return { ...request.user, profile: await this.usersService.findOne(request.user.sub)}
+  }
 }

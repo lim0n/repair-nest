@@ -12,14 +12,14 @@ import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.guard';
 import { ApiTags } from '@nestjs/swagger';
-import { CreateUserDto } from 'src/users/create-user.dto';
 import { User } from 'src/users/user.entity';
-// import { IUser } from 'src/users/user.interface';
 
 @ApiTags('Авторизация')
 @Controller('auth')
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+  ) {}
 
   @HttpCode(HttpStatus.OK)
   @Post('login')
@@ -41,8 +41,8 @@ export class AuthController {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Get('profile')
-  getProfile(@Request() req) {
-    return req.user;
+  getProfile(@Request() req: Request) {
+    return this.authService.getProfile(req)
   }
 
   @Post('refresh-access-token')

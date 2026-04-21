@@ -7,6 +7,7 @@ import { OrderDetailsModule } from './order_details/order_details.module';
 import { OrdersModule } from './orders/orders.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { RolesModule } from './roles/roles.module';
+import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import databaseConfig from './config/database.config';
 
 @Module({
@@ -20,7 +21,8 @@ import databaseConfig from './config/database.config';
     UsersModule,
     OrdersModule,
     OrderDetailsModule,
-    RolesModule
+    RolesModule,
+    RefreshTokenModule
   ],
   controllers: [],
   providers: [ConfigService],

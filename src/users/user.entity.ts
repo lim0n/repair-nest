@@ -17,13 +17,13 @@ import * as bcrypt from 'bcrypt';
 import { Order } from 'src/orders/entities/order.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
-import { RefreshToken } from './user-refresh-token.entity';
+import { RefreshToken } from 'src/refresh-token/entities/refresh-token.entity';
 
 @Entity('users')
 export class User {
   @ApiProperty({ example: 1, description: 'Уникальный идентификатор'})
   @PrimaryGeneratedColumn()
-  id?: number;
+  id: number;
 
   @ApiProperty({ example: 'Neo', description: 'Логин'})
   @Column({
@@ -109,8 +109,8 @@ export class User {
               {cascade: ["soft-remove"]} )
   orders: Order[];
 
-  @OneToMany( () => Order,
-            (order) => order.user,
+  @OneToMany( () => RefreshToken,
+            (token) => token.user,
             {cascade: ["soft-remove"]} )
   refreshTokens: RefreshToken[];
 

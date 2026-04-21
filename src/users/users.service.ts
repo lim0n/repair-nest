@@ -59,7 +59,8 @@ export class UsersService {
     const user = await this.usersRepository.findOne({ 
       where: { username },
       relations: {
-        roles: true
+        roles: true,
+        refreshTokens: true
       }
     });
     if (!user) {
@@ -112,7 +113,8 @@ export class UsersService {
       relations: { 
         orders: {
           orderDetails: true
-        }
+        },
+        refreshTokens: true
       }
     });
 

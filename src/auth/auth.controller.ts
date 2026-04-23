@@ -41,8 +41,9 @@ export class AuthController {
 
   @UseGuards(AuthGuard, RolesGuard)
   @Get('profile')
-  getProfile(@Request() req: Request) {
-    return this.authService.getProfile(req)
+  getProfile(@Request() req) {
+    // return req.user;
+    return this.authService.getProfile(req) 
   }
 
   @Post('refresh-access-token')

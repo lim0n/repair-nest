@@ -8,7 +8,8 @@ import {
   Put,
   Query,
   UseGuards,
-  UsePipes
+  UsePipes,
+  Request
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './create-user.dto';
@@ -20,6 +21,7 @@ import { Roles } from 'src/auth/roles.decorator';
 import { IRole } from 'src/auth/roles.enum';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { InfoValidationPipe } from 'src/pipes/info-validation.pipe';
+import { CreateAgreementDto } from 'src/agreements/dto/create-agreement.dto';
 
 @ApiTags('Пользователи')
 @Controller('users')
@@ -69,5 +71,21 @@ export class UsersController {
   @Delete('hard/:id')
   hardRemove(@Param('id') id: string) {
     return this.usersService.hardRemove(+id);
+  }
+
+  @ApiOperation({ summary: 'Добавление соглашения' })
+  @ApiResponse({ status: 200, type: User})
+  @UseGuards(AuthGuard)
+  @Post('add-agreement')
+  addAgreement(@Body() agreement: CreateAgreementDto, @Request() req) {
+    return this.usersService.addAgreement(agreement, req);
+  }
+
+  @ApiOperation({ summary: 'Отзыв соглашения соглашения' })
+  @ApiResponse({ status: 200, type: User})
+  @UseGuards(AuthGuard)
+  @Post('remove-agreement')
+  removeAgreement(@Body() agreement: CreateAgreementDto, @Request() req) {
+    return this.usersService.removeAgreement(agreement, req);
   }
 }

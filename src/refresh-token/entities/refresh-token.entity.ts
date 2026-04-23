@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { Column, CreateDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
+import { Column, CreateDateColumn, DeleteDateColumn, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 import { User } from "../../users/user.entity";
 
 @Entity('tokens')
@@ -24,6 +24,13 @@ export class RefreshToken {
   })
   @CreateDateColumn()
   created_at: Date;
+
+  @Column({ 
+    nullable: true,
+    type: 'timestamptz'
+  })
+  @DeleteDateColumn()
+  deleted_at: Date;
 
   @ManyToOne( () => User,
               (user) => user.refreshTokens,

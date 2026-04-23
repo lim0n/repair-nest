@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
@@ -7,6 +7,9 @@ import { UpdateUserDto } from './update-user.dto';
 import * as bcrypt from 'bcrypt';
 import { Role } from 'src/roles/roles.entity';
 import { RolesService } from 'src/roles/roles.service';
+import { CreateAgreementDto } from 'src/agreements/dto/create-agreement.dto';
+import type { Request } from 'express';
+import { AgreementsService } from 'src/agreements/agreements.service';
 
 @Injectable()
 export class UsersService {
@@ -14,7 +17,8 @@ export class UsersService {
   constructor(
     @InjectRepository(User)
     private usersRepository: Repository<User>,
-    private rolesService: RolesService
+    private rolesService: RolesService,
+    private agreementService: AgreementsService
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User | unknown> {
@@ -45,7 +49,9 @@ export class UsersService {
     const user = await this.usersRepository.findOne({ 
       where: { id },
       relations: {
-        roles: true
+        roles: true,
+        agreements: true,
+        orders: true
       }
     });
     if (!user) {
@@ -132,5 +138,38 @@ export class UsersService {
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${id} not found`);
     }
+  }
+
+  async addAgreement(dto: CreateAgreementDto, req) {
+    let user = await this.findOne(req?.user.sub);
+    const agreement = await this.agreementService.getAgreementByName(dto.name);
+    if (!agreement) {
+      throw new NotFoundException(`Aagreement with name ${dto.name} not found`);
+    }
+    console.warn('user.agreements', user.agreements);
+    const alreadyHave = user.agreements.findIndex(item => item.name === dto.name) !== -1;
+    if (alreadyHave) {
+      throw new ConflictException(`Already agreed`);
+    }
+    user.agreements.push(agreement);
+    return await this.usersRepository.save(user);
+  }
+
+  async removeAgreement(dto: CreateAgreementDto, req) {
+    let user = await this.findOne(req?.user.sub);
+    const agreement = await this.agreementService.getAgreementByName(dto.name);
+    if (!agreement) {
+      throw new NotFoundException(`Aagreement with name ${dto.name} not found`);
+    }
+    // const agreements = user.agreements.filter(item => item.name !== dto.name);
+
+    const index = user.agreements.findIndex(item => item.name === dto.name);
+
+    if (index !== -1) {
+      user.agreements.splice(index, 1); // Removes 1 item at the found index
+    }
+
+    // user.agreements.push(agreement.filter(item => item.name !== dto.name));
+    return await this.usersRepository.save(user);
   }
 }

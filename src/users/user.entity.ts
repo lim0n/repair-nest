@@ -18,6 +18,7 @@ import { Order } from 'src/orders/entities/order.entity';
 import { ApiProperty } from '@nestjs/swagger';
 import { Role } from 'src/roles/roles.entity';
 import { RefreshToken } from 'src/refresh-token/entities/refresh-token.entity';
+import { Agreement } from 'src/agreements/entities/agreement.entity';
 
 @Entity('users')
 export class User {
@@ -121,6 +122,14 @@ export class User {
       inverseJoinColumn: { name: "role_id", referencedColumnName: "id" }
   })
   roles: Role[];
+
+  @ManyToMany(() => Agreement, (agreement) => agreement.users, {cascade: true})
+  @JoinTable({
+      name: "user_agreements",
+      joinColumn: { name: "user_id", referencedColumnName: "id" },
+      inverseJoinColumn: { name: "agreement_id", referencedColumnName: "id" }
+  })
+  agreements: Agreement[];
 
   // @OneToMany( () => OrderDetails,
   //             (orderDetails) => orderDetails.user,

@@ -50,6 +50,12 @@ export class Order {
 
   @Column({
     nullable: true,
+    type: 'boolean'
+  })
+  isDraft: boolean;
+
+  @Column({
+    nullable: true,
     type: 'timestamptz'
   })
   @CreateDateColumn()
@@ -72,6 +78,6 @@ export class Order {
   @OneToMany( () => OrderDetails,
               (order_details) => order_details.order,
               {cascade: ["soft-remove"]} )
-  orderDetails: OrderDetails[];
+  order_details: OrderDetails[];
 
 }

@@ -25,7 +25,7 @@ export class OrdersService {
 
   async create(createOrderDto: CreateOrderDto, req: Request): Promise<CreateOrderDto & 'tokens'> {
     const dtoHasNoUser = !Boolean(createOrderDto.user_id);
-    let tokens = {};
+    let tokens;
 
     const result = await this.ordersRepository.createQueryBuilder()
       .insert()
@@ -34,10 +34,10 @@ export class OrdersService {
       .returning("*") 
       .execute();
 
-    if ( createOrderDto['details'] !== null && result.raw[0]?.id ) {
+    if ( createOrderDto['order_details'] && result.raw[0]?.id ) {
       const orderDetails = new CreateOrderDetailsDto();
       orderDetails.order_id = result.raw[0]?.id;
-      orderDetails.details = createOrderDto['details'];
+      orderDetails.details = createOrderDto['order_details'];
       orderDetails.author = result.raw[0]?.user_id;
       await this._orderDetailsService.create(orderDetails);
     }

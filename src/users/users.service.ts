@@ -51,7 +51,9 @@ export class UsersService {
       relations: {
         roles: true,
         agreements: true,
-        orders: true
+        orders: {
+          order_details: true
+        }
       }
     });
     if (!user) {
@@ -118,7 +120,7 @@ export class UsersService {
       
       relations: { 
         orders: {
-          orderDetails: true
+          order_details: true
         },
         refreshTokens: true
       }
@@ -146,7 +148,6 @@ export class UsersService {
     if (!agreement) {
       throw new NotFoundException(`Aagreement with name ${dto.name} not found`);
     }
-    console.warn('user.agreements', user.agreements);
     const alreadyHave = user.agreements.findIndex(item => item.name === dto.name) !== -1;
     if (alreadyHave) {
       throw new ConflictException(`Already agreed`);

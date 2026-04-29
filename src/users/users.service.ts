@@ -1,18 +1,22 @@
-import { ConflictException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+  OnApplicationBootstrap
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from './create-user.dto';
 import { UpdateUserDto } from './update-user.dto';
-import * as bcrypt from 'bcrypt';
 import { Role } from 'src/roles/roles.entity';
 import { RolesService } from 'src/roles/roles.service';
 import { CreateAgreementDto } from 'src/agreements/dto/create-agreement.dto';
-import type { Request } from 'express';
 import { AgreementsService } from 'src/agreements/agreements.service';
+import { CreateRoleDto } from 'src/roles/dto/create-role.dto';
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnApplicationBootstrap {
 
   constructor(
     @InjectRepository(User)
@@ -27,14 +31,8 @@ export class UsersService {
     if (role) {
       userData['roles'] = [role as Role];
     }
-    const user = await this.usersRepository.create(userData);
+    const user = await this.usersRepository.create({...userData, user_role});
     return await this.usersRepository.save(user);
-
-    // await dataSource
-    // .createQueryBuilder()
-    // .relation(User, "roles")
-    // .of(userId) // The ID of the user
-    // .add(roleId); // The ID of the role to add
   }
 
   async findAll(withDeleted?: boolean): Promise<User[]> {
@@ -74,9 +72,8 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with username ${username} not found`);
     }
-    // const { password, ...result } = user;
-    // return result;
-    return user;
+    const { password, ...result } = user;
+    return result;
   }
 
   async findUserByEmail(email: string): Promise<User> {
@@ -84,7 +81,8 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with email ${email} not found`);
     }
-    return user;
+    const { password, ...result } = user;
+    return result;
   }
 
   async findUserByPhone(phone: string): Promise<User> {
@@ -92,24 +90,12 @@ export class UsersService {
     if (!user) {
       throw new NotFoundException(`User with phone ${phone} not found`);
     }
-    return user;
+    const { password, ...result } = user;
+    return result;
   }
 
-  async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = {...updateUserDto};
-    if (user.password && typeof user.password === 'string') {
-      user.password = await bcrypt.hash(user.password, 4);
-    }
-    await this.usersRepository.update({id}, user);
-    return this.findOne(id);
-  }
-
-  async save(dto: UpdateUserDto): Promise<User> {
-    const user = {...dto};
-    if (user.password && typeof user.password === 'string') {
-      user.password = await bcrypt.hash(user.password, 4);
-    }
-    return await this.usersRepository.save(user);
+  async update(id: number, updateUserDto: UpdateUserDto) {
+    return await this.usersRepository.update({id}, updateUserDto);
   }
 
   async remove(id: number): Promise<void> {
@@ -162,15 +148,37 @@ export class UsersService {
     if (!agreement) {
       throw new NotFoundException(`Aagreement with name ${dto.name} not found`);
     }
-    // const agreements = user.agreements.filter(item => item.name !== dto.name);
-
     const index = user.agreements.findIndex(item => item.name === dto.name);
-
     if (index !== -1) {
       user.agreements.splice(index, 1); // Removes 1 item at the found index
     }
-
-    // user.agreements.push(agreement.filter(item => item.name !== dto.name));
     return await this.usersRepository.save(user);
+  }
+
+  async onApplicationBootstrap() {
+    const defaultRoles: CreateRoleDto[] = [
+      { name: 'admin', description: 'Администратор' },
+      { name: 'viewer', description: 'Посетитель' },
+      { name: 'editor', description: 'Редактор' },
+      { name: 'manager', description: 'Менеджер' }
+    ];
+
+    const defaultAdmin: CreateUserDto = {
+      username: 'john',
+      password: 'changeme',
+      user_role: 'admin'
+    };
+
+    defaultRoles.forEach(async role => {
+      const roleExists = await this.rolesService.getRoleByName(role.name);
+      if (!roleExists) {
+        await this.rolesService.createRole(role);
+      }
+    });
+
+    const userExists = await this.usersRepository.findOneBy({ username: defaultAdmin.username });
+    if (!userExists) {
+      await this.create(defaultAdmin);
+    }
   }
 }

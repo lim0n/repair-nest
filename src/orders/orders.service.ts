@@ -10,6 +10,7 @@ import { AuthService } from 'src/auth/auth.service';
 import { UsersService } from 'src/users/users.service';
 import { RolesService } from 'src/roles/roles.service';
 import type { Request } from 'express';
+import { randomUUID } from 'crypto';
 
 @Injectable()
 export class OrdersService {
@@ -25,12 +26,18 @@ export class OrdersService {
 
   async create(createOrderDto: CreateOrderDto, req: Request): Promise<CreateOrderDto & 'tokens'> {
     const dtoHasNoUser = !Boolean(createOrderDto.user_id);
-    let tokens;
+    let tokens, user, withUserCreateOrderDto;
+
+    if (dtoHasNoUser && !req['user']) {
+      const uuid = randomUUID();
+      user = await this._usersService.create({username: String(uuid)});
+      withUserCreateOrderDto = { ...createOrderDto, user_id: user.id };
+    }
 
     const result = await this.ordersRepository.createQueryBuilder()
       .insert()
       .into(Order)
-      .values(createOrderDto)
+      .values(withUserCreateOrderDto ?? createOrderDto)
       .returning("*") 
       .execute();
 
@@ -42,13 +49,7 @@ export class OrdersService {
       await this._orderDetailsService.create(orderDetails);
     }
 
-    if (dtoHasNoUser) {
-      let user = await this._usersService.findOne(result.raw[0]?.user_id);
-      const role = await this._rolesService.getRoleByName(user.user_role || "viewer");
-      if (role) {
-        user.roles.push(role)
-        user = await this._usersService.save(user);
-      }
+    if (dtoHasNoUser && user) {
       tokens = await this._authService.getTokens(user, req);
     }
 

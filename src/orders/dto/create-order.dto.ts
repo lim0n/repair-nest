@@ -21,4 +21,9 @@ export class CreateOrderDto {
   @MaxLength(20)
   @Transform(({ value }) => (value === '' ? undefined : value))
   readonly phone: string;
+
+  @IsOptional()
+  @IsString()
+  @MaxLength(50)
+  readonly order_name: string;
 }

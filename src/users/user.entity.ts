@@ -31,7 +31,7 @@ export class User {
     nullable: true,
     type: 'varchar',
     unique: true,
-    length: 30
+    length: 36
   })
   username?: string;
 

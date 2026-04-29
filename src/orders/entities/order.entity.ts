@@ -21,6 +21,13 @@ export class Order {
   @Column({ nullable: true })
   user_id: number;
 
+  @Column({
+    nullable: true,
+    type: 'varchar',
+    length: 50
+  })
+  order_name?: string;
+
   @ManyToOne( () => User,
               (user) => user.orders,
               {onDelete: 'CASCADE'} )

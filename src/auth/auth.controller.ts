@@ -13,6 +13,7 @@ import { AuthGuard } from './auth.guard';
 import { RolesGuard } from './roles.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/users/user.entity';
+import { OwnerGuard } from './owner.guard';
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -39,10 +40,9 @@ export class AuthController {
     return this.authService.signInByPhone(signInDto, req);
   }
 
-  @UseGuards(AuthGuard, RolesGuard)
   @Get('profile')
+  @UseGuards(AuthGuard, RolesGuard, OwnerGuard)
   getProfile(@Request() req) {
-    // return req.user;
     return this.authService.getProfile(req) 
   }
 
@@ -51,4 +51,3 @@ export class AuthController {
     return this.authService.getAccessTokenByRefreshToken(data.refreshToken, req);
   }
 }
-// curl -X POST http://localhost:3000/auth/login -d '{"username": "john", "password": "changeme"}' -H "Content-Type: application/json"

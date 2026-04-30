@@ -1,20 +1,22 @@
-import { ForbiddenException, Injectable, UnauthorizedException } from '@nestjs/common';
+import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
 import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import type { Request } from 'express';
 import { User } from 'src/users/user.entity';
 import { IJwt } from './jwt.interface';
-import { RefreshToken } from 'src/refresh-token/entities/refresh-token.entity';
 import { RefreshTokenService } from 'src/refresh-token/refresh-token.service';
-import { CreateRefreshTokenDto } from 'src/refresh-token/dto/create-refresh-token.dto';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
 
 @Injectable()
 export class AuthService {
     constructor(
       private usersService: UsersService,
       private jwtService: JwtService,
-      private refreshTokenService: RefreshTokenService
+      private refreshTokenService: RefreshTokenService,
+      @InjectRepository(User)
+      private usersRepository: Repository<User>,
   ) {}
 
   readonly bcrypt = bcrypt;
@@ -70,12 +72,13 @@ export class AuthService {
     try {
       const isValidAndDecoded = await this.jwtService.verifyAsync(refreshToken);
       const storedRefreshTokens = (await this.refreshTokenService.findByUserId(isValidAndDecoded.sub)).map(item => item.refreshToken);
-      const candidate = await this.usersService.findOne(isValidAndDecoded.sub);
+      const candidate = await this.usersRepository.findOne({ where: { id: isValidAndDecoded.sub }});
+      if (!candidate) { throw new NotFoundException }
       if (storedRefreshTokens.includes(refreshToken)) {
         return {access_token: await this.getAccessToken(candidate)};
       }
     } catch (error) {
-      throw new ForbiddenException();
+      throw new ForbiddenException(error);
     }
     throw new ForbiddenException();
   }
@@ -87,7 +90,8 @@ export class AuthService {
     if (!dto.username) { 
       throw new UnauthorizedException();
     }
-    const candidate = await this.usersService.findUserByName(dto.username);
+    const candidate = await this.usersRepository.findOneBy({ username: dto.username });
+    if (!candidate) { throw new NotFoundException }
     const user = await this.validateUser(candidate, dto.password);
     const tokens = await this.getTokens(user, req);
     if (user.id) {
@@ -125,6 +129,16 @@ export class AuthService {
   }
 
   async getProfile(request) {
-    return { ...request.user, profile: await this.usersService.findOne(request.user.sub)}
+    const profile = await this.usersRepository.findOne({ 
+      where: { id: request.user.sub },
+      relations: {
+        roles: true,
+        agreements: true,
+        orders: {
+          order_details: true
+        }
+      }
+    });
+    return { ...request.user, profile }
   }
 }

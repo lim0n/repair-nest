@@ -17,12 +17,14 @@ import { OwnerOfOrderGuard } from 'src/orders/owner-of-order.guard';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { Roles } from 'src/auth/roles.decorator';
 import { OwnerOfOrderOfOrderDetailsGuard } from './owner-of-order-details.guard';
+import { MatchDtoOrderIdToUserGuard } from './match-dto-order_id-user.guard';
 
 @Controller('order-details')
 export class OrderDetailsController {
   constructor(private readonly orderDetailsService: OrderDetailsService) {}
 
   @Post()
+  @UseGuards(AuthGuard, MatchDtoOrderIdToUserGuard)
   create(@Body() createOrderDetailsDto: CreateOrderDetailsDto) {
     return this.orderDetailsService.create(createOrderDetailsDto);
   }

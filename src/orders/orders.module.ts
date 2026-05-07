@@ -31,5 +31,6 @@ import { RolesModule } from 'src/roles/roles.module';
     },
   ],
   controllers: [OrdersController],
+  exports: [OrdersService]
 })
 export class OrdersModule {}

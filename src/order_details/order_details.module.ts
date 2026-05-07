@@ -5,9 +5,16 @@ import { TypeOrmExceptionFilter } from 'src/filters/typeorm-exception.filter';
 import { OrderDetailsController } from './order_details.controller';
 import { OrderDetailsService } from './order_details.service';
 import { OrderDetails } from './entities/order_details.entity';
+import { JwtModule } from '@nestjs/jwt';
+import jwtConfig from 'src/config/jwt.config';
+import { OrdersModule } from 'src/orders/orders.module';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([OrderDetails])],
+  imports: [
+    OrdersModule,
+    TypeOrmModule.forFeature([OrderDetails]),
+    JwtModule.registerAsync(jwtConfig.asProvider()),
+  ],
   providers: [
     OrderDetailsService,
     {

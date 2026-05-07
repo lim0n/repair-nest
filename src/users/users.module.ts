@@ -14,7 +14,7 @@ import { Agreement } from 'src/agreements/entities/agreement.entity';
 @Module({
   imports: [
     TypeOrmModule.forFeature([User, Role, Agreement]),
-    forwardRef(() => AuthModule) // защита от циклических зависимостей
+    forwardRef(() => AuthModule)
   ],
   providers: [
     UsersService,

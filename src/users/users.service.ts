@@ -95,7 +95,8 @@ export class UsersService implements OnApplicationBootstrap {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto) {
-    return await this.usersRepository.update({id}, updateUserDto);
+    await this.usersRepository.update({id}, updateUserDto);
+    return await this.findOne(id);
   }
 
   async remove(id: number): Promise<void> {
@@ -150,7 +151,7 @@ export class UsersService implements OnApplicationBootstrap {
     }
     const index = user.agreements.findIndex(item => item.name === dto.name);
     if (index !== -1) {
-      user.agreements.splice(index, 1); // Removes 1 item at the found index
+      user.agreements.splice(index, 1);
     }
     return await this.usersRepository.save(user);
   }

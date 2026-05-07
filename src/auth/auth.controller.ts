@@ -28,18 +28,6 @@ export class AuthController {
     return this.authService.signIn(signInDto, req);
   }
 
-  @HttpCode(HttpStatus.OK)
-  @Post('login/by-email')
-  signInByEmail(@Body() signInDto: User, @Request() req) {
-    return this.authService.signInByEmail(signInDto, req);
-  }
-
-  @HttpCode(HttpStatus.OK)
-  @Post('login/by-phone')
-  signInByPhone(@Body() signInDto: User, @Request() req) {
-    return this.authService.signInByPhone(signInDto, req);
-  }
-
   @Get('profile')
   @UseGuards(AuthGuard, RolesGuard, OwnerGuard)
   getProfile(@Request() req) {

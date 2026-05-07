@@ -12,7 +12,6 @@ import { Repository } from 'typeorm';
 @Injectable()
 export class AuthService {
     constructor(
-      private usersService: UsersService,
       private jwtService: JwtService,
       private refreshTokenService: RefreshTokenService,
       @InjectRepository(User)
@@ -90,7 +89,17 @@ export class AuthService {
     if (!dto.username) { 
       throw new UnauthorizedException();
     }
-    const candidate = await this.usersRepository.findOneBy({ username: dto.username });
+    const candidate = await this.usersRepository.findOne({ 
+      where: { username: dto.username },
+      relations: {
+        roles: true,
+        agreements: true,
+        orders: {
+          order_details: true
+        }
+      }
+    });
+    
     if (!candidate) { throw new NotFoundException }
     const user = await this.validateUser(candidate, dto.password);
     const tokens = await this.getTokens(user, req);
@@ -102,30 +111,6 @@ export class AuthService {
       this.refreshTokenService.create(newRefreshToken);
     }
     return tokens;
-  }
-
-  async signInByEmail(
-    dto: User,
-    req: Request
-  ): Promise<IJwt> {
-    if (!dto.email) { 
-      throw new UnauthorizedException();
-    }
-    const candidate = await this.usersService.findUserByEmail(dto.email);
-    const user = await this.validateUser(candidate, dto.password);
-    return this.getTokens(user, req);
-  }
-
-  async signInByPhone(
-    dto: User,
-    req: Request
-  ): Promise<IJwt> {
-    if (!dto.phone) { 
-      throw new UnauthorizedException();
-    }
-    const candidate = await this.usersService.findUserByPhone(dto.phone);
-    const user = await this.validateUser(candidate, dto.password);
-    return this.getTokens(user, req);
   }
 
   async getProfile(request) {

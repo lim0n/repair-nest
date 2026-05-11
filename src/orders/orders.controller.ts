@@ -16,7 +16,6 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { RolesGuard } from 'src/auth/roles.guard';
 import { AuthGuard } from 'src/auth/auth.guard';
 import { Roles } from 'src/auth/roles.decorator';
-import { OwnerGuard } from 'src/auth/owner.guard';
 import { OwnerOfOrderGuard } from './owner-of-order.guard';
 
 @Controller('orders')
@@ -36,7 +35,7 @@ export class OrdersController {
   }
 
   @Get('user/:id')
-  @UseGuards(AuthGuard, OwnerGuard)
+  @UseGuards(AuthGuard, OwnerOfOrderGuard)
   findByUserId(@Param('id') id: string) {
     return this.ordersService.findOrdersByUserId(+id);
   }

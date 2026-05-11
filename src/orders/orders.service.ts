@@ -11,6 +11,7 @@ import { UsersService } from 'src/users/users.service';
 import { RolesService } from 'src/roles/roles.service';
 import type { Request } from 'express';
 import { randomUUID } from 'crypto';
+import { OrderDetails } from 'src/order_details/entities/order_details.entity';
 
 @Injectable()
 export class OrdersService {
@@ -18,10 +19,10 @@ export class OrdersService {
   constructor(
     @InjectRepository(Order)
     private readonly ordersRepository: Repository<Order>,
-    private readonly _orderDetailsService: OrderDetailsService,
+    @InjectRepository(OrderDetails)
+    private ordersDetailsRepository: Repository<OrderDetails>,
     private readonly _usersService: UsersService,
     private readonly _authService: AuthService,
-    private readonly _rolesService: RolesService
   ) {}
 
   async create(createOrderDto: CreateOrderDto, req: Request): Promise<CreateOrderDto & 'tokens'> {
@@ -41,12 +42,12 @@ export class OrdersService {
       .returning("*") 
       .execute();
 
-    if ( createOrderDto['order_details'] && result.raw[0]?.id ) {
+    if ( createOrderDto['new_order_details'] && result.raw[0]?.id ) {
       const orderDetails = new CreateOrderDetailsDto();
       orderDetails.order_id = result.raw[0]?.id;
-      orderDetails.details = createOrderDto['order_details'];
+      orderDetails.details = createOrderDto['new_order_details'];
       orderDetails.author = result.raw[0]?.user_id;
-      await this._orderDetailsService.create(orderDetails);
+      await this.ordersDetailsRepository.create(orderDetails);
     }
 
     if (dtoHasNoUser && user) {

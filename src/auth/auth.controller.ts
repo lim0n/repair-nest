@@ -10,10 +10,8 @@ import {
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
-import { RolesGuard } from './roles.guard';
 import { ApiTags } from '@nestjs/swagger';
 import { User } from 'src/users/user.entity';
-import { OwnerGuard } from './owner.guard';
 
 @ApiTags('Авторизация')
 @Controller('auth')
@@ -29,7 +27,7 @@ export class AuthController {
   }
 
   @Get('profile')
-  @UseGuards(AuthGuard, RolesGuard, OwnerGuard)
+  @UseGuards(AuthGuard)
   getProfile(@Request() req) {
     return this.authService.getProfile(req) 
   }

@@ -4,11 +4,16 @@ import {
   ExecutionContext,
   ForbiddenException
 } from '@nestjs/common';
-import { OrdersService } from './orders.service';
+import { Order } from './entities/order.entity';
+import { Repository } from 'typeorm';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class OwnerOfOrderGuard implements CanActivate {
-  constructor(private ordersService: OrdersService) {}
+  constructor(
+    @InjectRepository(Order)
+    private readonly ordersRepository: Repository<Order>,
+  ) {}
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user;
@@ -16,9 +21,12 @@ export class OwnerOfOrderGuard implements CanActivate {
     
     if (!user || !targetId) return false;
 
-    const resource = await this.ordersService.findOne(targetId);
+    const resource = await this.ordersRepository.findOne({
+      where: { id: targetId },
+      relations: [ 'order_details' ]
+    })
 
-    if (resource && resource.user_id === user.sub || user.role === 'admin') {
+    if (resource && resource.user_id === user.sub || user?.roles?.some(role => role.name === 'admin') ) {
       return true;
     }
 

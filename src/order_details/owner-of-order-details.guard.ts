@@ -24,7 +24,7 @@ export class OwnerOfOrderOfOrderDetailsGuard implements CanActivate {
     const orderDetailsRecord = await this.orderDetailsService.findOne(orderDetailsId);
     const orderRecord = await this.ordersService.findOne(orderDetailsRecord.order_id);
 
-    if (orderRecord && orderRecord.user_id === user.sub || user.role === 'admin') {
+    if (orderRecord && orderRecord.user_id === user.sub || user?.roles?.some(role => role.name === 'admin') ) {
       return true;
     }
 

@@ -1,5 +1,4 @@
 import { ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { UsersService } from 'src/users/users.service';
 import { JwtService } from '@nestjs/jwt';
 import * as bcrypt from 'bcrypt';
 import type { Request } from 'express';
@@ -71,7 +70,12 @@ export class AuthService {
     try {
       const isValidAndDecoded = await this.jwtService.verifyAsync(refreshToken);
       const storedRefreshTokens = (await this.refreshTokenService.findByUserId(isValidAndDecoded.sub)).map(item => item.refreshToken);
-      const candidate = await this.usersRepository.findOne({ where: { id: isValidAndDecoded.sub }});
+      const candidate = await this.usersRepository.findOne({
+        where: { id: isValidAndDecoded.sub },
+        relations: {
+          roles: true,
+        }
+      });
       if (!candidate) { throw new NotFoundException }
       if (storedRefreshTokens.includes(refreshToken)) {
         return {access_token: await this.getAccessToken(candidate)};

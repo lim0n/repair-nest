@@ -79,7 +79,6 @@ export class UsersController {
   @ApiOperation({ summary: 'Добавление соглашения' })
   @ApiResponse({ status: 200, type: User})
   @Post('add-agreement')
-  @UseGuards(OwnerGuard)
   addAgreement(@Body() agreement: CreateAgreementDto, @Request() req) {
     return this.usersService.addAgreement(agreement, req);
   }
@@ -87,7 +86,6 @@ export class UsersController {
   @ApiOperation({ summary: 'Отзыв соглашения соглашения' })
   @ApiResponse({ status: 200, type: User})
   @Post('remove-agreement')
-  @UseGuards(OwnerGuard)
   removeAgreement(@Body() agreement: CreateAgreementDto, @Request() req) {
     return this.usersService.removeAgreement(agreement, req);
   }

@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { OrdersService } from './orders.service';
 import { OrdersController } from './orders.controller';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -12,19 +12,20 @@ import { AuthModule } from 'src/auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import jwtConfig from 'src/config/jwt.config';
 import { RolesModule } from 'src/roles/roles.module';
+import { OrderDetailsModule } from 'src/order_details/order_details.module';
 
 @Module({
   imports: [
     TypeOrmModule.forFeature([Order]),
     TypeOrmModule.forFeature([OrderDetails]),
     UsersModule,
+    forwardRef(() => OrderDetailsModule),
     JwtModule.registerAsync(jwtConfig.asProvider()),
     AuthModule,
     RolesModule
   ],
   providers: [
     OrdersService,
-    OrderDetailsService,
     {
       provide: APP_FILTER,
       useClass: TypeOrmExceptionFilter,

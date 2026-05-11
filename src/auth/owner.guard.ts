@@ -12,11 +12,7 @@ export class OwnerGuard implements CanActivate {
     const user = request.user;
     const targetId = request.params.id;
 
-    if (user && user.id === targetId) {
-      return true;
-    }
-    
-    if (user && user.role === 'admin') {
+    if (user && user.sub === targetId || user?.roles?.some(role => role.name === 'admin')) {
       return true;
     }
 

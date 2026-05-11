@@ -1,4 +1,4 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { RepairRequestModule } from './repair-request/repair-request.module';
 import { AuthModule } from './auth/auth.module';
 import { UsersModule } from './users/users.module';
@@ -10,6 +10,7 @@ import { RolesModule } from './roles/roles.module';
 import { RefreshTokenModule } from './refresh-token/refresh-token.module';
 import { AgreementsModule } from './agreements/agreements.module';
 import databaseConfig from './config/database.config';
+import { DelayMiddleware } from './middleware/delay/delay.middleware';
 
 @Module({
   imports: [
@@ -30,3 +31,10 @@ import databaseConfig from './config/database.config';
   providers: [ConfigService],
 })
 export class AppModule {}
+// export class AppModule implements NestModule {
+//   configure(consumer: MiddlewareConsumer) {
+//     consumer
+//       .apply(DelayMiddleware)
+//       .forRoutes('{*splat}');
+//   }
+// }

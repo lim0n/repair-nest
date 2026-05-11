@@ -21,7 +21,7 @@ export class MatchDtoOrderIdToUserGuard implements CanActivate {
 
     const orderRecord = await this.ordersService.findOne(request.body.order_id);
 
-    if (orderRecord && orderRecord.user_id === user.sub || user.role === 'admin' || user.role === 'manager') {
+    if (orderRecord && orderRecord.user_id === user.sub || user?.roles?.some(role => role.name === 'admin') || user?.roles?.some(role => role.name === 'manager') ) {
       return true;
     }
 

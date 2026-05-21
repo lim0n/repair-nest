@@ -118,7 +118,7 @@ export class AuthService {
   }
 
   async getProfile(request) {
-    const profile = await this.usersRepository.findOne({ 
+    const user = await this.usersRepository.findOne({ 
       where: { id: request.user.sub },
       relations: {
         roles: true,
@@ -128,6 +128,7 @@ export class AuthService {
         }
       }
     });
+    const { password, ...profile } = user!;
     return { ...request.user, profile }
   }
 }

@@ -170,6 +170,11 @@ export class UsersService implements OnApplicationBootstrap {
       user_role: 'admin'
     };
 
+    const pdn: CreateAgreementDto = {
+      name: 'obrabotka_pdn',
+      description: '/'
+    };
+
     defaultRoles.forEach(async role => {
       const roleExists = await this.rolesService.getRoleByName(role.name);
       if (!roleExists) {
@@ -180,6 +185,11 @@ export class UsersService implements OnApplicationBootstrap {
     const userExists = await this.usersRepository.findOneBy({ username: defaultAdmin.username });
     if (!userExists) {
       await this.create(defaultAdmin);
+    }
+
+    const agreementExists = await this.agreementService.getAgreementByName('obrabotka_pdn');
+    if (!agreementExists) {
+      await this.agreementService.create(pdn);
     }
   }
 }

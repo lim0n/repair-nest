@@ -1,0 +1,5 @@
+docker run --name repair-nest \
+  --network db-net \
+  -e DATABASE_URL=postgres://backend:backend@repair-db:5432/backend \
+  -p 8080:8080 \
+  -d my-app-image

@@ -1,6 +1,15 @@
 # Stage 1: Build the application
 FROM node:22-alpine AS builder
 
+# ENV DB_HOST=db
+# ENV DB_PORT=5432
+# ENV DB_USERNAME=backend
+# ENV DB_PASSWORD=backend
+# ENV DB_NAME=backend
+# ENV DB_SYNC=true
+# ENV JWT_ACCESS_TOKEN_EXPIRES=7d
+# ENV JWT_SECRET=fGRgJz
+
 WORKDIR /app
 
 # Copy dependency manifests

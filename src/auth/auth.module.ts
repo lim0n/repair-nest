@@ -7,6 +7,7 @@ import jwtConfig from 'src/config/jwt.config';
 import { RefreshTokenModule } from 'src/refresh-token/refresh-token.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
+import { ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
@@ -18,6 +19,7 @@ import { User } from 'src/users/user.entity';
   controllers: [AuthController],
   providers: [
     AuthService,
+    ConfigService
   ],
   exports: [
     AuthService,

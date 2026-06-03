@@ -7,7 +7,6 @@ import {
   Post,
   UseGuards,
   Request,
-  Logger
 } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthGuard } from './auth.guard';
@@ -19,7 +18,6 @@ import { ConfigService } from '@nestjs/config';
 @Controller('auth')
 export class AuthController {
 
-  private readonly logger = new Logger(AppController.name);
 
   constructor(
     private authService: AuthService,
@@ -45,18 +43,10 @@ export class AuthController {
 
   @Get('debug-env')
   displayEnv() {
-    // 1. Get a specific variable
     const dbUser = this.configService.get<string>('DB_USERNAME');
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
     const jwtAccessTokenExpires = this.configService.get<string>('JWT_ACCESS_TOKEN_EXPIRES');
 
-    
-    // 2. Print it to the terminal console
-    this.logger.log(`Database User: ${dbUser}`);
-    this.logger.log(`jwtSecret: ${jwtSecret}`);
-    this.logger.log(`jwtAccessTokenExpires: ${jwtAccessTokenExpires}`);
-
-    // 3. Return it in an API response
     return {
       port: this.configService.get<number>('DB_PORT'),
       user: dbUser,

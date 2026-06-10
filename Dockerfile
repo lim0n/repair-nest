@@ -1,5 +1,5 @@
 # Stage 1: Build the application
-FROM node:22-alpine AS builder
+FROM node:alpine AS builder
 
 # ENV DB_HOST=db
 # ENV DB_PORT=5432
@@ -25,7 +25,7 @@ COPY . .
 RUN npm run build
 
 # Stage 2: Create the runtime image
-FROM node:22-alpine AS runner
+FROM node:alpine AS runner
 
 WORKDIR /app
 
